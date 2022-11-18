@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "466932251632",
+    "project_id": "optimal-invoice",
+    "storage_bucket": "optimal-invoice.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466932251632:android:f1bae30a2f68f9636cbb35",
+        "android_client_info": {
+          "package_name": "com.example.test1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "466932251632-gj1khrb4hq8dpjv4b8bceec8s7acoo31.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2Jatd3dSjmy2Pb9YHlwiDSGk9luLCn4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "466932251632-gj1khrb4hq8dpjv4b8bceec8s7acoo31.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

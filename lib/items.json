@@ -1,0 +1,56 @@
+[
+{
+    "id":"1",
+    "item number":"1",
+    "item name":"milk",
+    "item price":"1"
+},
+{
+    "id":"2",
+    "item number":"2",
+    "item name":"oat",
+    "item price":"1"
+},
+{
+    "id":"3",
+    "item number":"3",
+    "item name":"juice",
+    "item price":"1"
+},
+{
+    "id":"4",
+    "item number":"4",
+    "item name":"cocoa",
+    "item price":"1"
+},
+{
+    "id":"5",
+    "item number":"5",
+    "item name":"sugar",
+    "item price":"1"
+},
+{
+    "id":"6",
+    "item number":"6",
+    "item name":"coofee",
+    "item price":"1"
+},
+{
+    "id":"7",
+    "item number":"7",
+    "item name":"water",
+    "item price":"1"
+},
+{
+    "id":"8",
+    "item number":"8",
+    "item name":"chocklate",
+    "item price":"1"
+},
+{
+    "id":"9",
+    "item number":"9",
+    "item name":"salt",
+    "item price":"1"
+}
+]
