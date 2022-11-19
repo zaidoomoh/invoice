@@ -153,25 +153,23 @@ class _AddItemsState extends State<AddItems> {
                             ),
                             onPressed: () {
                               if (cubit.formkey.currentState!.validate()) {
-                                cubit.quantity
-                                    .add(cubit.quantityController.text);
-                                cubit.totalOfItem.add(((cubit.cc[1] == 1
-                                        ? num.parse(
-                                            cubit.priceEditingController.text)
-                                        : cubit.currentAddedItem[0]['price']) *
-                                    num.parse(cubit.quantityController.text)));
 
-                                cubit.priceOfItem.add(cubit.cc[1] == 1
-                                    ? num.parse(
-                                        cubit.priceEditingController.text)
-                                    : cubit.currentAddedItem[0]['price']);
-
-                                debugPrint(cubit.totalOfItem.toString());
-                                cubit.calculateTotal();
-
-                                cubit.currentAddedItem.clear();
-                                cubit.quantityController.clear();
-
+                                // {cubit.quantity
+                                //     .add(cubit.quantityController.text);
+                                // cubit.totalOfItem.add(((cubit.cc[1] == 1
+                                //         ? num.parse(
+                                //             cubit.priceEditingController.text)
+                                //         : cubit.currentAddedItem[0]['price']) *
+                                //     num.parse(cubit.quantityController.text)));
+                                // cubit.priceOfItem.add(cubit.cc[1] == 1
+                                //     ? num.parse(
+                                //         cubit.priceEditingController.text)
+                                //     : cubit.currentAddedItem[0]['price']);
+                                // cubit.calculateTotal();
+                                // cubit.currentAddedItem.clear();
+                                // cubit.quantityController.clear();}
+                                  
+                                  cubit.addToList();
                                 Navigator.pop(context);
                               }
                             }),
@@ -197,23 +195,26 @@ class _AddItemsState extends State<AddItems> {
                             ),
                             onPressed: () {
                               if (cubit.formkey.currentState!.validate()) {
-                                cubit.quantity
-                                    .add(cubit.quantityController.text);
-                                cubit.totalOfItem.add(((cubit.cc[1] == 1
-                                        ? num.parse(
-                                            cubit.priceEditingController.text)
-                                        : cubit.currentAddedItem[0]['price']) *
-                                    num.parse(cubit.quantityController.text)));
-                                cubit.priceOfItem.add(cubit.cc[1] == 1
-                                    ? num.parse(
-                                        cubit.priceEditingController.text)
-                                    : cubit.currentAddedItem[0]['price']);
-                                debugPrint(cubit.totalOfItem.toString());
+                                //{
+                                // cubit.quantity
+                                //     .add(cubit.quantityController.text);
+                                // cubit.totalOfItem.add(((cubit.cc[1] == 1
+                                //         ? (num.parse(
+                                //             cubit.priceEditingController.text)+((cubit.items[0]["tax"]*num.parse(
+                                //             cubit.priceEditingController.text))/100))
+                                //         : (cubit.currentAddedItem[0]['price']+((cubit.items[0]["tax"]*cubit.currentAddedItem[0]['price'])/100))) *
+                                //     num.parse(cubit.quantityController.text)));
+                                // cubit.priceOfItem.add(cubit.cc[1] == 1
+                                //     ? num.parse(
+                                //         cubit.priceEditingController.text)
+                                //     : cubit.currentAddedItem[0]['price']);
+                                // debugPrint(cubit.totalOfItem.toString());
+                                // cubit.calculateTotal();
+                                // cubit.currentAddedItem.clear();
+                                // cubit.quantityController.clear();
+                                //}
+                                cubit.addToList();
 
-                                cubit.calculateTotal();
-
-                                cubit.currentAddedItem.clear();
-                                cubit.quantityController.clear();
                                 debugPrint(cubit.totalOfItem.toString());
                                 debugPrint(cubit.currentAddedItem.toString());
                                 debugPrint(cubit.quantity.toString());

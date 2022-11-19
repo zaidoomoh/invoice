@@ -65,14 +65,12 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   List<Map> settingsList = [];
   List totalOfItem = [];
   List quantity = [];
-  List priceOfItem=[];
+  List priceOfItem = [];
   List dropDownUnitsList = [];
   List<int> taxLIst = <int>[0, 4, 8, 16];
   List<Map> unitsList = [];
   late List<Map> allAddedItems = [];
   late List<Map> currentAddedItem = [];
-  
-  
 
   void _createSubjectsTable(Batch batch) {
     batch.execute(itemsTable);
@@ -149,7 +147,8 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
       getDataFromDatabase(database, "units").then((value) {
         unitsList = value;
         unitsList.forEach((element) {
-          dropDownUnitsList.add(element["unit"] + (element["unit_id"]).toString());
+          dropDownUnitsList
+              .add(element["unit"] + (element["unit_id"]).toString());
           debugPrint(element["unit"]);
           debugPrint(dropDownUnitsList.toString());
         });
@@ -424,7 +423,6 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
         clients = filteredClients = value;
         calculateDayTotal();
         emit(GetDatabase());
-        
       });
       getDataFromDatabase(database, "items").then((value) {
         items = filterdItems = value;
@@ -511,7 +509,6 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
   //DROPDOWN SECTION //////////////////////////////////////////////////////////
 
-  
   late String dropdownValue = (taxLIst.first).toString();
   void changeDropDownList(value) {
     dropdownValue = value;
@@ -585,8 +582,9 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
         emit(Filtering());
       } else {
         results = history
-            .where((user) =>(user["invoice_date"])
-                .toString().substring(8)
+            .where((user) => (user["invoice_date"])
+                .toString()
+                .substring(8)
                 .toLowerCase()
                 .contains(enteredKeyword.toString().toLowerCase()))
             .toList();
@@ -608,15 +606,15 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   var formkey = GlobalKey<FormState>();
 
   String clientName(index) {
-    
     client_id = clients[index]["client_id"];
     client_name = clients[index]["client_name"];
-    
-    emit(AddClient(client_name,client_id));
+
+    emit(AddClient(client_name, client_id));
     return client_name;
   }
+
   String writeClientName() {
-    client_name=writeClientNameCon.text;
+    client_name = writeClientNameCon.text;
     emit(WriteClient(client_name));
     return client_name;
   }
@@ -638,7 +636,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   num calculateTotal() {
-    totalAfter=totalBefor=0;
+    totalAfter = totalBefor = 0;
     totalOfItem.forEach((element) {
       totalBefor += element;
       totalAfter += element;
@@ -659,6 +657,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     getInvoiceNum();
     allAddedItems.clear();
     totalOfItem.clear();
+    priceOfItem.clear();
     quantity.clear();
     client_name = "";
     client_id = 0;
@@ -674,6 +673,44 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   TextEditingController emailAddress = TextEditingController();
   TextEditingController phone = TextEditingController();
   TextEditingController address = TextEditingController();
+  List saved = [];
+
+  showSavedItems(index) {
+    saved.clear();
+    savedItems.forEach((element) {
+      if (element["invoice_num"].toString() == filterdHistory[index]["invoice_number"].toString()) {
+        saved.add(element["invoice_items"].toString());
+      }
+    });
+    debugPrint(saved.toString());
+  }
+
+  
+
+  void addToList() {
+    quantity.add(quantityController.text);
+
+    totalOfItem.add(((cc[1] == 1
+            ? (num.parse(priceEditingController.text) +
+                ((currentAddedItem[0]["tax"] *
+                        num.parse(priceEditingController.text)) /
+                    100))
+            : (currentAddedItem[0]['price'] +
+                ((currentAddedItem[0]["tax"] * currentAddedItem[0]['price']) /
+                    100))) *
+        num.parse(quantityController.text)));
+
+    priceOfItem.add(cc[1] == 1
+        ? num.parse(priceEditingController.text)
+        : currentAddedItem[0]['price']);
+
+    calculateTotal();
+    Future.delayed(Duration(milliseconds: 100), () {
+      debugPrint("delaaaaaaaaaaaaaaaayed");
+      currentAddedItem.clear();
+      quantityController.clear();
+    });
+  }
 }
 
 // String business = "";

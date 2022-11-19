@@ -80,12 +80,14 @@ Future<List<Info>> dogs(String table) async {
     );
   });
 }
+
 class BillScreen extends StatefulWidget {
   const BillScreen({Key? key}) : super(key: key);
 
   @override
   State<BillScreen> createState() => _BillScreenState();
 }
+
 class _BillScreenState extends State<BillScreen> {
   @override
   @override
@@ -176,6 +178,14 @@ class _BillScreenState extends State<BillScreen> {
                                           Navigator.pop(context);
                                         }
                                       }),
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color.fromRGBO(
+                                              120, 166, 200, 1)),
+                                      child: const Text('CANCEL'),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      }),
                                 ],
                               )
                             ],
@@ -192,7 +202,9 @@ class _BillScreenState extends State<BillScreen> {
                         smallConWedth: blockSizeHorizontal *
                             100, //MediaQuery.of(context).size.width,
                         text: 'CLIENT',
-                        text1: state is AddClient?state.clientName:cubit.writeClientNameCon.text,
+                        text1: state is AddClient
+                            ? state.clientName
+                            : cubit.writeClientNameCon.text,
                         fontColor: Colors.grey,
                         onTap: () {
                           cubit.trueDate();
@@ -292,7 +304,8 @@ class _BillScreenState extends State<BillScreen> {
                                               onPressed: () {
                                                 if (cubit.formkey.currentState!
                                                         .validate() &&
-                                                    cubit.totalOfItem.isNotEmpty) {
+                                                    cubit.totalOfItem
+                                                        .isNotEmpty) {
                                                   setState(() {
                                                     cubit.dis = num.parse(
                                                         cubit.discountCon.text);
@@ -434,8 +447,8 @@ class _BillScreenState extends State<BillScreen> {
                                               ),
                                               Expanded(
                                                 child: ListView.builder(
-                                                    itemCount:
-                                                        cubit.allAddedItems.length,
+                                                    itemCount: cubit
+                                                        .allAddedItems.length,
                                                     itemBuilder:
                                                         (context, index) {
                                                       return Padding(
@@ -529,7 +542,7 @@ class _BillScreenState extends State<BillScreen> {
                                                                             fontSize: 15),
                                                                       ),
                                                                       Text(
-                                                                        "${ cubit.priceOfItem[index].toString()}JD",
+                                                                        "${cubit.priceOfItem[index].toString()}JD",
                                                                         style: const TextStyle(
                                                                             fontWeight:
                                                                                 FontWeight.w900,
@@ -619,18 +632,15 @@ class _BillScreenState extends State<BillScreen> {
                                             cubit.quantity.isNotEmpty &&
                                             cubit.totalOfItem.isNotEmpty) {
                                           cubit.insertToInvoiceInfo(
-
                                               clientId: cubit.client_id,
                                               notes: "",
-                                              invoiceNumber: cubit
-                                                  .getInvoiceNum()
-                                                  ,
+                                              invoiceNumber:
+                                                  cubit.getInvoiceNum(),
                                               invoiceDate: cubit.formattedDate
                                                   .toString(),
                                               clientName: cubit.client_name,
-                                              total:
-                                                  cubit.totalAfter);
-                                        
+                                              total: cubit.totalAfter);
+
                                           // while (cubit.savedItemsIndx <
                                           //     cubit.allAddedItems.length) {
                                           //   cubit.insertInvoiceItems(
@@ -651,18 +661,24 @@ class _BillScreenState extends State<BillScreen> {
                                           //           );
                                           //   cubit.savedItemsIndx++;
                                           // }
-                                          cubit.allAddedItems.forEach((element) { 
+                                          cubit.allAddedItems
+                                              .forEach((element) {
                                             cubit.insertInvoiceItems(
-                                                infoId: cubit.getInfoId(),
-                                                unitId: 0,
-                                                quentity: int.parse(cubit.quantity[cubit.allAddedItems.indexOf(element)]),
-                                                price:(cubit.totalOfItem[cubit.allAddedItems.indexOf(element)]),
-                                                tax:int.parse(cubit.dropdownValue) ,
-                                                invoiceNumber: cubit
-                                                    .getInvoiceNum(),
-                                                    items: element["item_desc"]
-                                                    ,
-                                                    );
+                                              infoId: cubit.getInfoId(),
+                                              unitId: 0,
+                                              quentity: int.parse(
+                                                  cubit.quantity[cubit
+                                                      .allAddedItems
+                                                      .indexOf(element)]),
+                                              price: (cubit.totalOfItem[cubit
+                                                  .allAddedItems
+                                                  .indexOf(element)]),
+                                              tax: int.parse(
+                                                  cubit.dropdownValue),
+                                              invoiceNumber:
+                                                  cubit.getInvoiceNum(),
+                                              items: element["item_desc"],
+                                            );
                                           });
                                         }
                                         cubit.afterSave();
@@ -671,7 +687,6 @@ class _BillScreenState extends State<BillScreen> {
                                 ],
                               ),
                             ))),
-
                   ),
                 ],
               ),
@@ -841,9 +856,10 @@ class _BillScreenState extends State<BillScreen> {
 
                                                 setState(() {});
                                               },
-                                              items: cubit.dropDownUnitsList.map<
-                                                      DropdownMenuItem<String>>(
-                                                  (value) {
+                                              items: cubit.dropDownUnitsList
+                                                  .map<
+                                                      DropdownMenuItem<
+                                                          String>>((value) {
                                                 return DropdownMenuItem<String>(
                                                   value: value.toString(),
                                                   child: Text(value

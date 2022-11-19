@@ -65,7 +65,7 @@ class home extends StatelessWidget {
                     cubit.calculateDayTotal();
                     cubit.changeScreenIndex(index);
 
-                    debugPrint(cubit.settingsList.toString());
+                    debugPrint(cubit.items.toString());
                   },
                   elevation: 20,
                   selectedFontSize: 15,

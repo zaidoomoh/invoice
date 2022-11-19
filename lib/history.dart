@@ -75,7 +75,7 @@ class _HistoryState extends State<History> {
                           onChanged: (value) {
                             cubit.filtering(value.toString(), "history");
                           },
-                          
+
                           keyboardType: TextInputType.datetime,
                           decoration: const InputDecoration(
                             labelText: "Filtering",
@@ -108,67 +108,74 @@ class _HistoryState extends State<History> {
                                     key: UniqueKey(),
                                     onDismissed: (direction) {
                                       showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Wrap(children: <Widget>[
-                                      StatefulBuilder(
-                                        builder: (BuildContext context,
-                                            void Function(void Function())
-                                                setState) {
-                                          return AlertDialog(
-                                            title:
-                                                const Text('  هل تريد حذف هذه المادة'),
-                                            content: Form(
-                                              key: cubit.formkey,
-                                              child: Column(children: []),
+                                        context: context,
+                                        builder: (context) {
+                                          return Wrap(children: <Widget>[
+                                            StatefulBuilder(
+                                              builder: (BuildContext context,
+                                                  void Function(void Function())
+                                                      setState) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                      '  هل تريد حذف هذه المادة'),
+                                                  content: Form(
+                                                    key: cubit.formkey,
+                                                    child: Column(children: []),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  const Color
+                                                                          .fromRGBO(
+                                                                      120,
+                                                                      166,
+                                                                      200,
+                                                                      1)),
+                                                      child:
+                                                          const Text('CANCEL'),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    Builder(builder: (context) {
+                                                      return ElevatedButton(
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                                  backgroundColor:
+                                                                      const Color
+                                                                              .fromRGBO(
+                                                                          120,
+                                                                          166,
+                                                                          200,
+                                                                          1)),
+                                                          child: const Text(
+                                                              'SAVE'),
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                            cubit.deleteFromDB(
+                                                                id: cubit.history[
+                                                                        index]
+                                                                    ["info_id"],
+                                                                tableName:
+                                                                    "invoice_info",
+                                                                columnName:
+                                                                    "info_id");
+                                                          });
+                                                    }),
+                                                  ],
+                                                );
+                                              },
                                             ),
-                                            actions: <Widget>[
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        const Color.fromRGBO(
-                                                            120, 166, 200, 1)),
-                                                child: const Text('CANCEL'),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                  
-                                                },
-                                              ),
-                                              Builder(builder: (context) {
-                                                return ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                const Color
-                                                                        .fromRGBO(
-                                                                    120,
-                                                                    166,
-                                                                    200,
-                                                                    1)),
-                                                    child: const Text('SAVE'),
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                       cubit.deleteFromDB(id: cubit.history[index]["info_id"],
-                                                       tableName: "invoice_info",
-                                                       columnName: "info_id"
-                                                       );
-                                                    });
-                                              }),
-                                            ],
-                                          );
+                                          ]);
                                         },
-                                      ),
-                                    ]);
-                                  },
-                                );
-
-                                     
+                                      );
                                     },
                                     child: InkWell(
                                       onLongPress: () {
-                                        debugPrint(
-                                            cubit.savedItems.length.toString());
-                                        debugPrint(cubit.savedItems.toString());
+                                        cubit.showSavedItems(index);
                                         showDialog(
                                           context: context,
                                           builder: (context) {
@@ -189,34 +196,12 @@ class _HistoryState extends State<History> {
                                                             return Wrap(
                                                               children: [
                                                                 AlertDialog(
-                                                                  title:
-                                                                      const Text(
-                                                                          " المواد"),
+                                                                  title: const Text(
+                                                                      " المواد"),
                                                                   content: Text(
-                                                                      cubit.savedItems[
-                                                                              index]
-                                                                          [
-                                                                          "invoice_items"]),
-                                                                  // content: SizedBox(
-                                                                  //   height: 100,
-                                                                  //   width: 100,
-                                                                  //   child: ListView
-                                                                  //       .builder(
-                                                                  //     shrinkWrap: true,
-                                                                  //     itemCount: 2,
-                                                                  //     // cubit
-                                                                  //     //       .savedItems[index][""],
-                                                                  //     itemBuilder:/* */
-                                                                  //         (context,
-                                                                  //             index) {
-                                                                  //       return Text(cubit
-                                                                  //           .savedItems[
-                                                                  //               index][cubit.savedItems[int.parse(cubit.savedItems[index]["invoice_num"])]["invoice_items"]
-                                                                  //               ]
-                                                                  //           .toString());
-                                                                  //     },
-                                                                  //   ),
-                                                                  // ),
+                                                                      cubit
+                                                                          .saved
+                                                                          .toString()),
                                                                   actions: [
                                                                     ElevatedButton(
                                                                       style: ElevatedButton.styleFrom(
@@ -239,6 +224,7 @@ class _HistoryState extends State<History> {
                                                             );
                                                           },
                                                         );
+                                                        
                                                       },
                                                     ),
                                                   ]),

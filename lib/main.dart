@@ -1,5 +1,6 @@
 //flutter build apk --split-per-abi --no-sound-null-safety
 //import 'package:firebase_core/firebase_core.dart';
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -17,15 +18,12 @@ import 'states.dart';
 import 'package:sizer/sizer.dart';
 
 void main() async{
+  Timer(const Duration(seconds: 5), () {
+  debugPrint("Yeah, this line is printed after 1 minutes");
+});
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
-  //await Firebase.initializeApp();
-  // await Hive.initFlutter();
-  // Hive.registerAdapter(AddClientsAdapter());
-  // await Hive.openBox<AddClients>('clients');
- 
   Bloc.observer = MyBlocObserver();
-  
   runApp(  const MaterialApp(debugShowCheckedModeBanner: false, home: Test()));
 }
 
