@@ -91,7 +91,7 @@ class _AddItemsState extends State<AddItems> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: defaultTextFormFeild(
-                        validating: "قم بادخال الكمية",
+                        warning: "قم بادخال الكمية",
                         color: Colors.black,
                         controller: cubit.quantityController,
                         type: TextInputType.number,
@@ -113,7 +113,7 @@ class _AddItemsState extends State<AddItems> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: defaultTextFormFeild(
-                          validating: "",
+                          warning: "",
                           color: Colors.black,
                           controller: cubit.priceEditingController,
                           type: TextInputType.number,

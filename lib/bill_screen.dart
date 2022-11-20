@@ -98,7 +98,7 @@ class _BillScreenState extends State<BillScreen> {
         var cubit = BlocProvider.of<InvoiceCubit>(context);
 
         var formatter = NumberFormat('0000');
-        var totalFormatter = NumberFormat('##.00');
+        var totalFormatter = NumberFormat('###.##');
         TextEditingController nameController = TextEditingController();
         TextEditingController subjectNumberController = TextEditingController();
         TextEditingController priceController = TextEditingController();
@@ -149,7 +149,7 @@ class _BillScreenState extends State<BillScreen> {
                                         height: 10,
                                       ),
                                       defaultTextFormFeild(
-                                        validating: " يرجى ادخال اسم العميل ",
+                                        warning: " يرجى ادخال اسم العميل ",
                                         color: Colors.black,
                                         controller: cubit.writeClientNameCon,
                                         type: TextInputType.name,
@@ -277,7 +277,7 @@ class _BillScreenState extends State<BillScreen> {
                                                 height: 10,
                                               ),
                                               defaultTextFormFeild(
-                                                validating:
+                                                warning:
                                                     "يرجى ادخال قيمة الخصم",
                                                 color: Colors.black,
                                                 controller: cubit.discountCon,
@@ -342,7 +342,7 @@ class _BillScreenState extends State<BillScreen> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          "TOTAL : ${cubit.dis == 0 ? cubit.totalBefor : totalFormatter.format(cubit.totalAfter)} ",
+                                          "TOTAL : ${cubit.dis == 0 ? totalFormatter.format(cubit.totalBefor) : totalFormatter.format(cubit.totalAfter)} ",
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
@@ -549,7 +549,8 @@ class _BillScreenState extends State<BillScreen> {
                                                                             fontSize: 15),
                                                                       ),
                                                                       Text(
-                                                                        "${cubit.totalOfItem[index].toString()}JD",
+                                                                        "${totalFormatter.format(cubit.totalOfItem[index])
+                                                                          .toString()}JD",
                                                                         style: const TextStyle(
                                                                             fontWeight:
                                                                                 FontWeight.w900,
@@ -751,7 +752,7 @@ class _BillScreenState extends State<BillScreen> {
                                       key: cubit.formkey,
                                       child: Column(children: [
                                         defaultTextFormFeild(
-                                          validating: "قم بادخال الاسم",
+                                          warning: "قم بادخال الاسم",
                                           color: Colors.black,
                                           controller: nameController,
                                           type: TextInputType.name,
@@ -767,7 +768,7 @@ class _BillScreenState extends State<BillScreen> {
                                           height: 10,
                                         ),
                                         defaultTextFormFeild(
-                                          validating: "قم بادخال رقم المادة",
+                                          warning: "قم بادخال رقم المادة",
                                           color: Colors.black,
                                           controller: subjectNumberController,
                                           type: TextInputType.number,
@@ -783,7 +784,7 @@ class _BillScreenState extends State<BillScreen> {
                                           height: 10,
                                         ),
                                         defaultTextFormFeild(
-                                          validating: "قم بادخال السعر",
+                                          warning: "قم بادخال السعر",
                                           color: Colors.black,
                                           controller: priceController,
                                           type: TextInputType.number,

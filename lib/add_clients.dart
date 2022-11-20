@@ -54,7 +54,7 @@ class _AddClientsState extends State<AddClients> {
                             ),
                             defaultTextFormFeild(
                               
-                                validating: "يرجى ملئ الحقل",
+                                warning: "يرجى ملئ الحقل",
                                 color: Colors.black,
                                 controller: clientName,
                                 type: TextInputType.name,
@@ -88,7 +88,7 @@ class _AddClientsState extends State<AddClients> {
                             ),
                             defaultTextFormFeild(
                               
-                                validating: "يرجى ملئ الحقل",
+                                warning: "يرجى ملئ الحقل",
                                 color: Colors.black,
                                 controller: phone,
                                 type: TextInputType.number,
