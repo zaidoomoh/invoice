@@ -36,14 +36,14 @@ class _AddItemsState extends State<AddItems> {
               }
             },
             child: WillPopScope(
-              onWillPop: () async{
+              onWillPop: () async {
                 debugPrint("done");
                 Navigator.pop(context);
                 cubit.allAddedItems.removeLast();
                 cubit.currentAddedItem.removeLast();
                 cubit.priceEditingController =
                     TextEditingController(text: null);
-                    return true;
+                return true;
               },
               child: Scaffold(
                 resizeToAvoidBottomInset: false,
@@ -88,20 +88,64 @@ class _AddItemsState extends State<AddItems> {
                     const SizedBox(
                       height: 10,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: defaultTextFormFeild(
-                        warning: "قم بادخال الكمية",
-                        color: Colors.black,
-                        controller: cubit.quantityController,
-                        type: TextInputType.number,
-                        onSubmit: () {},
-                        onChange: () {},
-                        label: "الكميه",
-                        prefix: Icons.numbers,
-                        textInputFormatter:
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                      ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              setState(() {
+                                cubit.quantityController.text =
+                                    (num.parse(cubit.quantityController.text) -
+                                            1)
+                                        .toString();
+                              });
+                            },
+                            backgroundColor:
+                                const Color.fromRGBO(120, 166, 200, 1),
+                            child: const Icon(
+                              Icons.horizontal_rule,
+                              size: 40,
+                              color: Color.fromRGBO(233, 238, 244, 1),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: defaultTextFormFeild(
+                            warning: "قم بادخال الكمية",
+                            color: Colors.black,
+                            controller: cubit.quantityController,
+                            type: TextInputType.number,
+                            onSubmit: () {},
+                            onChange: () {},
+                            label: "الكميه",
+                            prefix: Icons.numbers,
+                            textInputFormatter:
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9]')),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              setState(() {
+                                cubit.quantityController.text =
+                                    (num.parse(cubit.quantityController.text) +
+                                            1)
+                                        .toString();
+                              });
+                            },
+                            backgroundColor:
+                                const Color.fromRGBO(120, 166, 200, 1),
+                            child: const Icon(
+                              Icons.add,
+                              size: 40,
+                              color: Color.fromRGBO(233, 238, 244, 1),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(
                       height: 10,
@@ -153,7 +197,6 @@ class _AddItemsState extends State<AddItems> {
                             ),
                             onPressed: () {
                               if (cubit.formkey.currentState!.validate()) {
-
                                 // {cubit.quantity
                                 //     .add(cubit.quantityController.text);
                                 // cubit.totalOfItem.add(((cubit.cc[1] == 1
@@ -168,8 +211,8 @@ class _AddItemsState extends State<AddItems> {
                                 // cubit.calculateTotal();
                                 // cubit.currentAddedItem.clear();
                                 // cubit.quantityController.clear();}
-                                  
-                                  cubit.addToList();
+
+                                cubit.addToList();
                                 Navigator.pop(context);
                               }
                             }),

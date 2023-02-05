@@ -2,7 +2,7 @@
 //import 'package:firebase_core/firebase_core.dart';
 import 'dart:async';
 import 'dart:ui';
-
+import 'package:flutter_cart/flutter_cart.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,7 +10,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sizer/sizer.dart';
-import 'package:test1/hive_model.dart';
 import 'cubit.dart';
 import 'home.dart';
 import 'shared/blpc_observer.dart';

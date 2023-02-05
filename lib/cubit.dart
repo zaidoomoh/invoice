@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqlbrite/sqlbrite.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:test1/dbhelper.dart';
-import 'package:test1/hive_model.dart';
+
 import 'bill_screen.dart';
 import 'history.dart';
 import 'items_modle.dart';
@@ -21,15 +21,15 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
   //HIVE SECTION
 
-  void put({required String name, required int num}) {
-    final clients = AddClients()
-      ..name = name
-      ..num = num;
+  // void put({required String name, required int num}) {
+  //   final clients = AddClients()
+  //     ..name = name
+  //     ..num = num;
 
-    final box = Boxes.get();
-    box.add(clients);
-    debugPrint(box.values.toList().cast<AddClients>().toString());
-  }
+  //   final box = Boxes.get();
+  //   box.add(clients);
+  //   debugPrint(box.values.toList().cast<AddClients>().toString());
+  // }
 
   //DATABASE SECTION //////////////////////////////////////////////////////////////
 
@@ -534,10 +534,11 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   //CONTROLLERS SECTION /////////////////////////////////////////////////////////////
-  TextEditingController discountCon = TextEditingController();
+  TextEditingController discountCon = TextEditingController(text: "1");
+  TextEditingController discountCon2 = TextEditingController();
   TextEditingController writeClientNameCon = TextEditingController();
   late TextEditingController priceEditingController = TextEditingController();
-  TextEditingController quantityController = TextEditingController();
+  TextEditingController quantityController = TextEditingController(text: "1");
   TextEditingController clientsFilteringController = TextEditingController();
   TextEditingController itemsFilteringController = TextEditingController();
   TextEditingController historyFilteringController = TextEditingController();
@@ -678,14 +679,22 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   showSavedItems(index) {
     saved.clear();
     savedItems.forEach((element) {
-      if (element["invoice_num"].toString() == filterdHistory[index]["invoice_number"].toString()) {
+      if (element["invoice_num"].toString() ==
+          filterdHistory[index]["invoice_number"].toString()) {
         saved.add(element["invoice_items"].toString());
       }
     });
     debugPrint(saved.toString());
   }
 
-  
+  isExist(controller, BuildContext context) {
+    items.forEach((element) {
+      if (controller.text == element["item_num"]) {
+        return ;
+      }
+      
+    });return true;
+  }
 
   void addToList() {
     quantity.add(quantityController.text);
@@ -705,7 +714,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
         : currentAddedItem[0]['price']);
 
     calculateTotal();
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       debugPrint("delaaaaaaaaaaaaaaaayed");
       currentAddedItem.clear();
       quantityController.clear();
@@ -714,10 +723,10 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 }
 
 // String business = "";
-  // void addBusiness() {
-  //   business = businessName.text;
-  //   //emit(AddBusiness());
-  // }
+// void addBusiness() {
+//   business = businessName.text;
+//   //emit(AddBusiness());
+// }
 
 // Future<void> insertAmount(context) async {
 //   emit(OpenDialogForQuantity());

@@ -42,7 +42,7 @@ Widget defaultCard({
   required Function onTap,
 }) =>
     Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
       child: SizedBox(
         height: smallConHeigt,
         width: smallConWedth,
@@ -62,7 +62,7 @@ Widget defaultCard({
                     Text(
                       text,
                       style: TextStyle(
-                          fontFamily: 'Antihero',
+                          
                           fontSize: fontSize,
                           fontWeight: FontWeight.bold,
                           color: fontColor),
@@ -73,7 +73,7 @@ Widget defaultCard({
                     Text(
                       text1,
                       style: TextStyle(
-                          fontFamily: 'Dubai',
+                          
                           fontSize: fontSize,
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
@@ -94,6 +94,9 @@ Widget defaultTextFormFeild(
         required IconData prefix,
         required Color color,
         String? warning,
+        
+
+         
         TextInputFormatter? textInputFormatter}) =>
     SizedBox(
         child: TextFormField(

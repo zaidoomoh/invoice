@@ -34,19 +34,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return Column(
                         children: [
                           CheckboxListTile(
-                            value: 
-                            cubit.settingsList.isEmpty
+                            value: cubit.settingsList.isEmpty
                                 ? false
-                                :(cubit.cc[index]==0?false:true),
-                                //bool.fromEnvironment(cubit.settingsList[index]["settings_state"])  ,
+                                : (cubit.cc[index] == 0 ? false : true),
+                            //bool.fromEnvironment(cubit.settingsList[index]["settings_state"])  ,
                             onChanged: ((value) {
                               print(index);
-                              cubit.updateSettings(state:value==false?0:1, name: "${cubit.settingsList[index]["settings"]}");
+                              cubit.updateSettings(
+                                  state: value == false ? 0 : 1,
+                                  name:
+                                      "${cubit.settingsList[index]["settings"]}");
                               print(cubit.settingsList.toString());
                               cubit.change(value, index);
-                              Navigator.pop(context);
                             }),
-                            title:  Text(cubit.settingsList[index]["settings"].toString()),
+                            title: Text(cubit.settingsList[index]["settings"]
+                                .toString()),
                           ),
                           // CheckboxListTile(
                           //   value: cubit.settingsList.isEmpty
@@ -90,26 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.startFloat,
-              floatingActionButton: Row(children: <Widget>[
-                Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: SizedBox(
-                      height: 70,
-                      child: FittedBox(
-                        child: FloatingActionButton(
-                            backgroundColor: Color.fromRGBO(120, 166, 200, 1),
-                            elevation: 20,
-                            child: const Icon(
-                              Icons.save,
-                              size: 40,
-                              color: Color.fromRGBO(233, 238, 244, 1),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            }),
-                      ),
-                    ))
-              ]));
+              floatingActionButton: Row(children: const <Widget>[]));
         });
   }
 }

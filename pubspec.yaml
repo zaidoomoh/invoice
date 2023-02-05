@@ -45,6 +45,7 @@ dependencies:
   synchronized: ^3.0.0+3
   sqlbrite: ^2.3.0
   path: ^1.8.2
+  flutter_cart: any
   
 
   #firebase
