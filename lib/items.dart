@@ -169,20 +169,35 @@ class _TestState extends State<Items> {
                                     ],
                                   ),
                                   onTap: () async {
-                                    cubit.priceEditingController =
-                                        TextEditingController(
-                                            text: cubit.items[index]["price"]
-                                                .toString());
+                                    if (cubit.sellsOrReturns == true) {
+                                      /*returns*/
+                                      cubit.allReturnsItems
+                                          .add(cubit.items[index]);
+                                      cubit.currentReturnsItem
+                                          .add(cubit.items[index]);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AddItems()),
+                                      );
+                                    } else {
+                                      cubit.priceEditingController =
+                                          TextEditingController(
+                                              text: cubit.items[index]["price"]
+                                                  .toString());
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AddItems()),
-                                    );
-                                    cubit.allAddedItems.add(cubit.items[index]);
-                                    cubit.currentAddedItem
-                                        .add(cubit.items[index]);
+                                      cubit.allAddedItems
+                                          .add(cubit.items[index]);
+                                      cubit.currentAddedItem
+                                          .add(cubit.items[index]);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AddItems()),
+                                      );
+                                    }
                                   },
                                   onLongPress: () {
                                     showDialog(
@@ -346,3 +361,4 @@ class _TestState extends State<Items> {
 // })
 /*
  */
+//[{kye:value},{kye:value},{kye:value},{kye:value}]

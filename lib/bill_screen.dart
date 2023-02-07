@@ -1,5 +1,6 @@
+//
 // ignore_for_file: deprecated_member_use
-
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:intl/intl.dart';
+import 'package:test1/returns.dart';
 import 'client.dart';
 import 'cubit.dart';
 import 'settings.dart';
@@ -218,6 +220,10 @@ class _BillScreenState extends State<BillScreen> {
                   children: [
                     InkWell(
                       onTap: () {
+                        
+                        
+                        cubit.addRecords();
+                        cubit.sellsOrReturns = false;
                         cubit.trueDate();
                         Navigator.push(
                           context,
@@ -280,8 +286,8 @@ class _BillScreenState extends State<BillScreen> {
                                                   prefix: Icons.discount,
                                                   textInputFormatter:
                                                       FilteringTextInputFormatter
-                                                          .allow(
-                                                              RegExp(r'[0-9]')),
+                                                          .allow(RegExp(
+                                                              r'[0-9 .]')),
                                                   onChange: () {},
                                                   onSubmit: () {},
                                                 ),
@@ -301,7 +307,11 @@ class _BillScreenState extends State<BillScreen> {
                                                           .formkey.currentState!
                                                           .validate() &&
                                                       cubit.totalOfItem
-                                                          .isNotEmpty) {
+                                                          .isNotEmpty &&
+                                                      num.parse(cubit
+                                                              .discountCon
+                                                              .text) <=
+                                                          100) {
                                                     setState(() {
                                                       cubit.dis = num.parse(
                                                           cubit.discountCon
@@ -331,7 +341,11 @@ class _BillScreenState extends State<BillScreen> {
                                                           .formkey.currentState!
                                                           .validate() &&
                                                       cubit.totalOfItem
-                                                          .isNotEmpty) {
+                                                          .isNotEmpty &&
+                                                      num.parse(cubit
+                                                              .discountCon
+                                                              .text) <=
+                                                          cubit.totalAfter) {
                                                     setState(() {
                                                       cubit.dis = num.parse(
                                                           cubit.discountCon
@@ -740,8 +754,6 @@ class _BillScreenState extends State<BillScreen> {
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap: () {
-                        // cubit.openDialog(context);
-                        debugPrint(cubit.unitsList.toString());
                         showDialog(
                           context: context,
                           builder: (context) {
@@ -903,42 +915,38 @@ class _BillScreenState extends State<BillScreen> {
                                             onPressed: () {
                                               if (cubit.formkey.currentState!
                                                   .validate()) {
-                                                if (1 == 1) {
-                                                } else {
-                                                  cubit
-                                                      .insertToDatabase(
-                                                          tax: int.parse(cubit
-                                                              .dropdownValue),
-                                                          unitId: int.parse(cubit
-                                                              .unitDropdownValue[(cubit
-                                                                  .unitDropdownValue
-                                                                  .length -
-                                                              1)]),
-                                                          name: nameController
-                                                              .text,
-                                                          number:
-                                                              subjectNumberController
-                                                                  .text
-                                                                  .toString(),
-                                                          price: priceController
-                                                              .text
-                                                              .toString())
-                                                      .then((value) {
-                                                    Navigator.pop(context);
-                                                    nameController.clear();
-                                                    subjectNumberController
-                                                        .clear();
-                                                    priceController.clear();
-                                                    Fluttertoast.showToast(
-                                                      msg:
-                                                          "تمت اضافة هذه المادة",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG,
-                                                      gravity:
-                                                          ToastGravity.CENTER,
-                                                    );
-                                                  });
-                                                }
+                                                cubit
+                                                    .insertToDatabase(
+                                                        tax: int.parse(cubit
+                                                            .dropdownValue),
+                                                        unitId: int.parse(cubit
+                                                            .unitDropdownValue[(cubit
+                                                                .unitDropdownValue
+                                                                .length -
+                                                            1)]),
+                                                        name:
+                                                            nameController.text,
+                                                        number:
+                                                            subjectNumberController
+                                                                .text
+                                                                .toString(),
+                                                        price: priceController
+                                                            .text
+                                                            .toString())
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  nameController.clear();
+                                                  subjectNumberController
+                                                      .clear();
+                                                  priceController.clear();
+                                                  Fluttertoast.showToast(
+                                                    msg: "تمت اضافة هذه المادة",
+                                                    toastLength:
+                                                        Toast.LENGTH_LONG,
+                                                    gravity:
+                                                        ToastGravity.CENTER,
+                                                  );
+                                                });
                                               }
                                             });
                                       }),
@@ -953,8 +961,14 @@ class _BillScreenState extends State<BillScreen> {
                 );
               }),
               Builder(builder: ((context) {
-                return const ListTile(
-                  title: Text(
+                return ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Returns()),
+                    );
+                  },
+                  title: const Text(
                     'المرتجعات',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),

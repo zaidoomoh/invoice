@@ -107,6 +107,7 @@ class _HistoryState extends State<History> {
                                   return Dismissible(
                                     key: UniqueKey(),
                                     onDismissed: (direction) {
+                                      setState(() {});
                                       showDialog(
                                         context: context,
                                         builder: (context) {
@@ -117,7 +118,7 @@ class _HistoryState extends State<History> {
                                                       setState) {
                                                 return AlertDialog(
                                                   title: const Text(
-                                                      '  هل تريد حذف هذه المادة'),
+                                                      'هل تريد حذف هذه المادة'),
                                                   content: Form(
                                                     key: cubit.formkey,
                                                     child: Column(children: []),
@@ -155,14 +156,20 @@ class _HistoryState extends State<History> {
                                                           onPressed: () {
                                                             Navigator.pop(
                                                                 context);
-                                                            cubit.deleteFromDB(
-                                                                id: cubit.history[
-                                                                        index]
-                                                                    ["info_id"],
-                                                                tableName:
-                                                                    "invoice_info",
-                                                                columnName:
-                                                                    "info_id");
+                                                            // cubit.deleteFromDB(
+                                                            //     id: cubit.history[
+                                                            //             index]
+                                                            //         ["info_id"],
+                                                            //     tableName:
+                                                            //         "invoice_info",
+                                                            //     columnName:
+                                                            //         "info_id");
+                                                            
+                                                            cubit.savedItems[index]["quentity"]>0?
+                                                            cubit.updateToReturns(quantity:(cubit.savedItems[index]["quentity"])*(-1),
+                                                             id:cubit.savedItems[index]["info_id"]):debugPrint("did not work");
+
+                                                             
                                                           });
                                                     }),
                                                   ],
@@ -224,7 +231,6 @@ class _HistoryState extends State<History> {
                                                             );
                                                           },
                                                         );
-                                                        
                                                       },
                                                     ),
                                                   ]),

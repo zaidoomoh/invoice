@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test1/home.dart';
 
 import 'cubit.dart';
+import 'returns.dart';
 import 'shared/components/components.dart';
 import 'states.dart';
 
@@ -68,14 +69,19 @@ class _AddItemsState extends State<AddItems> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  cubit.currentAddedItem[0]["item_desc"],
+                                  cubit.sellsOrReturns == true
+                                      ? cubit.currentReturnsItem[0]["item_desc"]
+                                      : cubit.currentAddedItem[0]["item_desc"],
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                    (cubit.currentAddedItem[0]["price"])
-                                        .toString(),
+                                    cubit.sellsOrReturns == true
+                                        ? (cubit.currentReturnsItem[0]["price"])
+                                            .toString()
+                                        : (cubit.currentAddedItem[0]["price"])
+                                            .toString(),
                                     style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold))
@@ -95,10 +101,16 @@ class _AddItemsState extends State<AddItems> {
                           child: FloatingActionButton(
                             onPressed: () {
                               setState(() {
-                                cubit.quantityController.text =
-                                    (num.parse(cubit.quantityController.text) -
-                                            1)
-                                        .toString();
+                                cubit.quantityController.text.isNotEmpty
+                                    ? num.parse(cubit.quantityController.text) >
+                                            1
+                                        ? cubit.quantityController.text =
+                                            (num.parse(cubit.quantityController
+                                                        .text) -
+                                                    1)
+                                                .toString()
+                                        : null
+                                    : cubit.quantityController.text = "1";
                               });
                             },
                             backgroundColor:
@@ -122,7 +134,7 @@ class _AddItemsState extends State<AddItems> {
                             prefix: Icons.numbers,
                             textInputFormatter:
                                 FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9]')),
+                                    RegExp(r'[0-9 .]')),
                           ),
                         ),
                         Padding(
@@ -130,10 +142,13 @@ class _AddItemsState extends State<AddItems> {
                           child: FloatingActionButton(
                             onPressed: () {
                               setState(() {
-                                cubit.quantityController.text =
-                                    (num.parse(cubit.quantityController.text) +
+                                cubit.quantityController.text.isNotEmpty
+                                    ? cubit
+                                        .quantityController.text = (num.parse(
+                                                cubit.quantityController.text) +
                                             1)
-                                        .toString();
+                                        .toString()
+                                    : cubit.quantityController.text = "1";
                               });
                             },
                             backgroundColor:
@@ -197,21 +212,6 @@ class _AddItemsState extends State<AddItems> {
                             ),
                             onPressed: () {
                               if (cubit.formkey.currentState!.validate()) {
-                                // {cubit.quantity
-                                //     .add(cubit.quantityController.text);
-                                // cubit.totalOfItem.add(((cubit.cc[1] == 1
-                                //         ? num.parse(
-                                //             cubit.priceEditingController.text)
-                                //         : cubit.currentAddedItem[0]['price']) *
-                                //     num.parse(cubit.quantityController.text)));
-                                // cubit.priceOfItem.add(cubit.cc[1] == 1
-                                //     ? num.parse(
-                                //         cubit.priceEditingController.text)
-                                //     : cubit.currentAddedItem[0]['price']);
-                                // cubit.calculateTotal();
-                                // cubit.currentAddedItem.clear();
-                                // cubit.quantityController.clear();}
-
                                 cubit.addToList();
                                 Navigator.pop(context);
                               }
@@ -238,7 +238,31 @@ class _AddItemsState extends State<AddItems> {
                             ),
                             onPressed: () {
                               if (cubit.formkey.currentState!.validate()) {
-                                //{
+                                if (cubit.sellsOrReturns == true) {
+                                  cubit.addToList();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Returns()),
+                                  );
+                                } else {
+                                  cubit.addToList();
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                      '/', (Route<dynamic> route) => false);
+                                }
+                              }
+                            }),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+}
+//{
                                 // cubit.quantity
                                 //     .add(cubit.quantityController.text);
                                 // cubit.totalOfItem.add(((cubit.cc[1] == 1
@@ -256,24 +280,3 @@ class _AddItemsState extends State<AddItems> {
                                 // cubit.currentAddedItem.clear();
                                 // cubit.quantityController.clear();
                                 //}
-                                cubit.addToList();
-
-                                debugPrint(cubit.totalOfItem.toString());
-                                debugPrint(cubit.currentAddedItem.toString());
-                                debugPrint(cubit.quantity.toString());
-                                debugPrint(cubit.allAddedItems.toString());
-
-                                Navigator.of(context).pushNamedAndRemoveUntil(
-                                    '/', (Route<dynamic> route) => false);
-                              }
-                            }),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          );
-        });
-  }
-}

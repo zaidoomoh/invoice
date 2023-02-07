@@ -2,19 +2,15 @@
 //import 'package:firebase_core/firebase_core.dart';
 import 'dart:async';
 import 'dart:ui';
-import 'package:flutter_cart/flutter_cart.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sizer/sizer.dart';
 import 'cubit.dart';
 import 'home.dart';
 import 'shared/blpc_observer.dart';
 import 'states.dart';
-import 'package:sizer/sizer.dart';
+//import 'firebase_options.dart';
 
 void main() async{
   Timer(const Duration(seconds: 5), () {
@@ -22,6 +18,9 @@ void main() async{
 });
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
+  await Firebase.initializeApp();
+  //options: DefaultFirebaseOptions.currentPlatform,
+
   Bloc.observer = MyBlocObserver();
   runApp(  const MaterialApp(debugShowCheckedModeBanner: false, home: Test()));
 }

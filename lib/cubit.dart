@@ -1,12 +1,11 @@
+//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqlbrite/sqlbrite.dart';
-import 'package:synchronized/synchronized.dart';
-import 'package:test1/dbhelper.dart';
-
 import 'bill_screen.dart';
 import 'history.dart';
 import 'items_modle.dart';
@@ -18,6 +17,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   InvoiceCubit() : super(InvoiceInitStates());
 
   static InvoiceCubit get(context) => BlocProvider.of(context);
+  bool sellsOrReturns = false;
 
   //HIVE SECTION
 
@@ -61,6 +61,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   List<Map> items = [];
   List<Map> clients = [];
   List<Map> history = [];
+  List<Map> returns = [];
   List<Map> savedItems = [];
   List<Map> settingsList = [];
   List totalOfItem = [];
@@ -71,6 +72,11 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   List<Map> unitsList = [];
   late List<Map> allAddedItems = [];
   late List<Map> currentAddedItem = [];
+
+  late List<Map> allReturnsItems = [];
+  late List<Map> currentReturnsItem = [];
+  List totalOfReturns = [];
+  List priceOfReturns = [];
 
   void _createSubjectsTable(Batch batch) {
     batch.execute(itemsTable);
@@ -263,6 +269,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
         getDataFromDatabase(database, "invoice_items").then((value) {
           savedItems = value;
+
           emit(GetDatabase());
         });
       });
@@ -398,6 +405,20 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     });
   }
 
+  void updateToReturns({required int quantity, required int id}) {
+    database?.rawUpdate(
+      'UPDATE invoice_items SET quentity = ? WHERE info_id = ?',
+      [quantity, id],
+    ).then((value) {
+      getDataFromDatabase(database, "invoice_items").then((value) {
+        //history = filterdHistory = value;
+        savedItems = value;
+        emit(GetDatabase());
+      });
+      emit(UpdateFromDatabase());
+    });
+  }
+
   void updateSubjects(
       {required String price, required String name, required String number}) {
     database?.rawUpdate(
@@ -457,11 +478,57 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   //FIREBASE SECTION /////////////////////////////////////////////////////////////////
+final fireStore = FirebaseFirestore.instance;
+late var batch = fireStore.batch();
+var records = [{'name': 'milk', 'price': 1},{'name': 'oat', 'price': 2}];
+final records1 = <String, String>{'name': 'oat', 'price': "2"};
+  
 
+
+
+
+
+ void addRecords() async {
+  // fireStore
+  //   .collection("items")
+  //   .doc("LA1")
+  //   .set({});
+
+    //Collection:
+
+// FirebaseFirestore.instance 
+//     .collection('items')
+//     .add({'some_key': records});
+
+//Document:
+
+FirebaseFirestore.instance 
+    .doc('items/1')
+    .set({'some_key': records});
+
+
+
+  
+  // CollectionReference collectionReference = fireStore.collection('items');
+   // Start a batch write
+  // WriteBatch batch = fireStore.batch();
+  /// Add multiple records to the batch
+  // batch.set(collectionReference.doc(), {
+  //   'name': 'milk',
+  //   'price': '1',
+  // });
+  // batch.set(collectionReference.doc(), {
+  //   'name': 'oat',
+  //   'price': '3',
+  // });
+
+  // Commit the batch write
+  // await batch.commit();
+}
   /*
   int aa = 0;
   late var s = itemss.doc("1");
-  final _fireStore = FirebaseFirestore.instance;
+  
   late CollectionReference itemss =
       FirebaseFirestore.instance.collection('items');
   late QuerySnapshot querySnapshot = itemss.get() as QuerySnapshot<Object?>;
@@ -535,7 +602,6 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
   //CONTROLLERS SECTION /////////////////////////////////////////////////////////////
   TextEditingController discountCon = TextEditingController(text: "1");
-  TextEditingController discountCon2 = TextEditingController();
   TextEditingController writeClientNameCon = TextEditingController();
   late TextEditingController priceEditingController = TextEditingController();
   TextEditingController quantityController = TextEditingController(text: "1");
@@ -655,10 +721,15 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   void afterSave() {
+    debugPrint(history.toString());
+    debugPrint(savedItems.toString());
     getInvoiceNum();
     allAddedItems.clear();
+    allReturnsItems.clear();
     totalOfItem.clear();
     priceOfItem.clear();
+    totalOfReturns.clear();
+    priceOfReturns.clear();
     quantity.clear();
     client_name = "";
     client_id = 0;
@@ -690,43 +761,58 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   isExist(controller, BuildContext context) {
     items.forEach((element) {
       if (controller.text == element["item_num"]) {
-        return ;
+        return;
       }
-      
-    });return true;
+    });
+    return true;
   }
 
   void addToList() {
-    quantity.add(quantityController.text);
-
-    totalOfItem.add(((cc[1] == 1
-            ? (num.parse(priceEditingController.text) +
-                ((currentAddedItem[0]["tax"] *
+    if (sellsOrReturns == true) {
+      quantity.add((num.parse(quantityController.text)*(-1)).toString());
+    totalOfReturns.add(((cc[1] == 1//هون
+            ? (num.parse(priceEditingController.text ) +
+                ((currentReturnsItem[0]["tax"] *
                         num.parse(priceEditingController.text)) /
                     100))
-            : (currentAddedItem[0]['price'] +
-                ((currentAddedItem[0]["tax"] * currentAddedItem[0]['price']) /
+            : (currentReturnsItem[0]['price'] +
+                ((currentReturnsItem[0]["tax"] * currentReturnsItem[0]['price']) /
                     100))) *
-        num.parse(quantityController.text)));
-
-    priceOfItem.add(cc[1] == 1
+        num.parse(quantityController.text)*(-1)));//لهون
+    priceOfReturns.add(cc[1] == 1
         ? num.parse(priceEditingController.text)
-        : currentAddedItem[0]['price']);
-
+        : currentReturnsItem[0]['price']);
     calculateTotal();
     Future.delayed(const Duration(milliseconds: 100), () {
-      debugPrint("delaaaaaaaaaaaaaaaayed");
-      currentAddedItem.clear();
+      currentReturnsItem.clear();
       quantityController.clear();
     });
+    } else {
+      quantity.add(quantityController.text);
+      totalOfItem.add(((cc[1] == 1 //هون
+              ? (num.parse(priceEditingController.text) +
+                  ((currentAddedItem[0]["tax"] *
+                          num.parse(priceEditingController.text)) /
+                      100))
+              : (currentAddedItem[0]['price'] +
+                  ((currentAddedItem[0]["tax"] * currentAddedItem[0]['price']) /
+                      100))) *
+          num.parse(quantityController.text))); //لهون
+          /* */
+      priceOfItem.add(cc[1] == 1
+          ? num.parse(priceEditingController.text)
+          : currentAddedItem[0]['price']);
+      calculateTotal();
+      Future.delayed(const Duration(milliseconds: 100), () {
+        currentAddedItem.clear();
+        quantityController.clear();
+      });
+    }
+    debugPrint("1111111111111111111111");
   }
 }
 
-// String business = "";
-// void addBusiness() {
-//   business = businessName.text;
-//   //emit(AddBusiness());
-// }
+
 
 // Future<void> insertAmount(context) async {
 //   emit(OpenDialogForQuantity());
@@ -746,21 +832,20 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 //               child: const Text('save'),
 //               onPressed: () {
 //                 emit(AddItemToInvoice());
-//                 //quantity = int.parse(quantityController.text);
+             //quantity = int.parse(quantityController.text);
 //                 print(cardList1.length);
-//                 // print(cardList2.length);
-//                 // print(cardList3.length);
+                 // print(cardList2.length);
+                 // print(cardList3.length);
 //                 cardList1[index]['quantity'].add(quantity.toString());
 //                 print(cardList1.length);
-//                 // print(cardList2.length);
-//                 // print(cardList3.length);
+                 // print(cardList2.length);
+                 // print(cardList3.length);
 //                 Navigator.pop(context);
 //                 cardHeigt += 60;
 //                 quantityController.clear();
-//                 // Navigator.push(
-//                 //   context,
-//                 //   MaterialPageRoute(builder: (context) => home()),
-//                 // );
+                 // Navigator.push(
+                 //   context,
+                 //   MaterialPageRoute(builder: (context) => home()),//                 // );
 //                 //Navigator.pop(context);
 //               },
 //             ),
