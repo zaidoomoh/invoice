@@ -137,7 +137,8 @@ class _AddClientsState extends State<AddClients> {
                             }),
                       ),
                     ))
-              ]));
+              ])
+              );
         });
   }
 }

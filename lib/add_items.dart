@@ -25,237 +25,225 @@ class _AddItemsState extends State<AddItems> {
         builder: (context, state) {
           var cubit = BlocProvider.of<InvoiceCubit>(context);
 
-          return Dismissible(
-            key: UniqueKey(),
-            onDismissed: (direction) {
-              if (direction == DismissDirection.startToEnd) {
-                Navigator.pop(context);
-                cubit.allAddedItems.removeLast();
-                cubit.currentAddedItem.removeLast();
-                cubit.priceEditingController =
-                    TextEditingController(text: null);
-              }
+          return WillPopScope(
+            onWillPop: () async {
+              debugPrint("done");
+              Navigator.pop(context);
+              cubit.allAddedItems.removeLast();
+              cubit.currentAddedItem.removeLast();
+              cubit.priceEditingController =
+                  TextEditingController(text: "1");
+              return true;
             },
-            child: WillPopScope(
-              onWillPop: () async {
-                debugPrint("done");
-                Navigator.pop(context);
-                cubit.allAddedItems.removeLast();
-                cubit.currentAddedItem.removeLast();
-                cubit.priceEditingController =
-                    TextEditingController(text: null);
-                return true;
-              },
-              child: Scaffold(
-                resizeToAvoidBottomInset: false,
-                appBar: AppBar(
-                    automaticallyImplyLeading: false,
-                    backgroundColor: const Color.fromRGBO(50, 103, 137, 1),
-                    title: const Text("Item")),
-                body: SingleChildScrollView(
-                    child: Form(
-                  key: cubit.formkey,
-                  child: Column(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: SizedBox(
-                        height: 100,
-                        child: Card(
-                          elevation: 20,
-                          color: const Color.fromRGBO(233, 238, 244, 1),
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
+            child: Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                  automaticallyImplyLeading: false,
+                  backgroundColor: const Color.fromRGBO(50, 103, 137, 1),
+                  title: const Text("Item")),
+              body: SingleChildScrollView(
+                  child: Form(
+                key: cubit.formkey,
+                child: Column(children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: SizedBox(
+                      height: 100,
+                      child: Card(
+                        elevation: 20,
+                        color: const Color.fromRGBO(233, 238, 244, 1),
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                cubit.sellsOrReturns == true
+                                    ? cubit.currentReturnsItem[0]["item_desc"]
+                                    : cubit.currentAddedItem[0]["item_desc"],
+                                style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
                                   cubit.sellsOrReturns == true
-                                      ? cubit.currentReturnsItem[0]["item_desc"]
-                                      : cubit.currentAddedItem[0]["item_desc"],
+                                      ? (cubit.currentReturnsItem[0]["price"])
+                                          .toString()
+                                      : (cubit.currentAddedItem[0]["price"])
+                                          .toString(),
                                   style: const TextStyle(
                                       fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                    cubit.sellsOrReturns == true
-                                        ? (cubit.currentReturnsItem[0]["price"])
-                                            .toString()
-                                        : (cubit.currentAddedItem[0]["price"])
-                                            .toString(),
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold))
-                              ],
-                            ),
+                                      fontWeight: FontWeight.bold))
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              setState(() {
-                                cubit.quantityController.text.isNotEmpty
-                                    ? num.parse(cubit.quantityController.text) >
-                                            1
-                                        ? cubit.quantityController.text =
-                                            (num.parse(cubit.quantityController
-                                                        .text) -
-                                                    1)
-                                                .toString()
-                                        : null
-                                    : cubit.quantityController.text = "1";
-                              });
-                            },
-                            backgroundColor:
-                                const Color.fromRGBO(120, 166, 200, 1),
-                            child: const Icon(
-                              Icons.horizontal_rule,
-                              size: 40,
-                              color: Color.fromRGBO(233, 238, 244, 1),
-                            ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            setState(() {
+                              cubit.quantityController.text.isNotEmpty
+                                  ? num.parse(cubit.quantityController.text) >
+                                          1
+                                      ? cubit.quantityController.text =
+                                          (num.parse(cubit.quantityController
+                                                      .text) -
+                                                  1)
+                                              .toString()
+                                      : null
+                                  : cubit.quantityController.text = "1";
+                            });
+                          },
+                          backgroundColor:
+                              const Color.fromRGBO(120, 166, 200, 1),
+                          child: const Icon(
+                            Icons.horizontal_rule,
+                            size: 40,
+                            color: Color.fromRGBO(233, 238, 244, 1),
                           ),
                         ),
-                        Expanded(
-                          child: defaultTextFormFeild(
-                            warning: "قم بادخال الكمية",
-                            color: Colors.black,
-                            controller: cubit.quantityController,
-                            type: TextInputType.number,
-                            onSubmit: () {},
-                            onChange: () {},
-                            label: "الكميه",
-                            prefix: Icons.numbers,
-                            textInputFormatter:
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9 .]')),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: FloatingActionButton(
-                            onPressed: () {
-                              setState(() {
-                                cubit.quantityController.text.isNotEmpty
-                                    ? cubit
-                                        .quantityController.text = (num.parse(
-                                                cubit.quantityController.text) +
-                                            1)
-                                        .toString()
-                                    : cubit.quantityController.text = "1";
-                              });
-                            },
-                            backgroundColor:
-                                const Color.fromRGBO(120, 166, 200, 1),
-                            child: const Icon(
-                              Icons.add,
-                              size: 40,
-                              color: Color.fromRGBO(233, 238, 244, 1),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Visibility(
-                      visible: cubit.settingsList.isEmpty
-                          ? false
-                          : (cubit.cc[1] == 0 ? false : true),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      ),
+                      Expanded(
                         child: defaultTextFormFeild(
-                          warning: "",
+                          warning: "قم بادخال الكمية",
                           color: Colors.black,
-                          controller: cubit.priceEditingController,
+                          controller: cubit.quantityController,
                           type: TextInputType.number,
                           onSubmit: () {},
                           onChange: () {},
-                          label: "تعديل السعر",
+                          label: "الكميه",
                           prefix: Icons.numbers,
-                          textInputFormatter: FilteringTextInputFormatter.allow(
-                              RegExp(r'[0-9 .]')),
+                          textInputFormatter:
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[0-9 .]')),
                         ),
                       ),
-                    )
-                  ]),
-                )),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerFloat,
-                floatingActionButton: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: FittedBox(
-                        child: FloatingActionButton.extended(
-                            heroTag: "1",
-                            backgroundColor:
-                                const Color.fromRGBO(120, 166, 200, 1), //78a6c8
-                            elevation: 20,
-                            label: const Text(
-                              "اضافة ",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            icon: const Icon(
-                              Icons.add,
-                              size: 40,
-                              color: Color.fromRGBO(233, 238, 244, 1),
-                            ),
-                            onPressed: () {
-                              if (cubit.formkey.currentState!.validate()) {
-                                cubit.addToList();
-                                Navigator.pop(context);
-                              }
-                            }),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            setState(() {
+                              cubit.quantityController.text.isNotEmpty
+                                  ? cubit
+                                      .quantityController.text = (num.parse(
+                                              cubit.quantityController.text) +
+                                          1)
+                                      .toString()
+                                  : cubit.quantityController.text = "1";
+                            });
+                          },
+                          backgroundColor:
+                              const Color.fromRGBO(120, 166, 200, 1),
+                          child: const Icon(
+                            Icons.add,
+                            size: 40,
+                            color: Color.fromRGBO(233, 238, 244, 1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Visibility(
+                    visible: cubit.settingsList.isEmpty
+                        ? false
+                        : (cubit.cc[1] == 0 ? false : true),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: defaultTextFormFeild(
+                        warning: "",
+                        color: Colors.black,
+                        controller: cubit.priceEditingController,
+                        type: TextInputType.number,
+                        onSubmit: () {},
+                        onChange: () {},
+                        label: "تعديل السعر",
+                        prefix: Icons.numbers,
+                        textInputFormatter: FilteringTextInputFormatter.allow(
+                            RegExp(r'[0-9 .]')),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: FittedBox(
-                        child: FloatingActionButton.extended(
-                            heroTag: "2",
-                            backgroundColor:
-                                const Color.fromRGBO(120, 166, 200, 1), //78a6c8
-                            elevation: 20,
-                            label: const Text(
-                              "انهاء",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            icon: const Icon(
-                              Icons.close,
-                              size: 40,
-                              color: Color.fromRGBO(233, 238, 244, 1),
-                            ),
-                            onPressed: () {
-                              if (cubit.formkey.currentState!.validate()) {
-                                if (cubit.sellsOrReturns == true) {
-                                  cubit.addToList();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const Returns()),
-                                  );
-                                } else {
-                                  cubit.addToList();
-                                  Navigator.of(context).pushNamedAndRemoveUntil(
-                                      '/', (Route<dynamic> route) => false);
-                                }
+                  )
+                ]),
+              )),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: FittedBox(
+                      child: FloatingActionButton.extended(
+                          // heroTag: "1",
+                          backgroundColor:
+                              const Color.fromRGBO(120, 166, 200, 1), //78a6c8
+                          elevation: 20,
+                          label: const Text(
+                            "اضافة ",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          icon: const Icon(
+                            Icons.add,
+                            size: 40,
+                            color: Color.fromRGBO(233, 238, 244, 1),
+                          ),
+                          onPressed: () {
+                            if (cubit.formkey.currentState!.validate()) {
+                              cubit.addToList();
+                              Navigator.pop(context);
+                            }
+                          }),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: FittedBox(
+                      child: FloatingActionButton.extended(
+                          // heroTag: "2",
+                          backgroundColor:
+                              const Color.fromRGBO(120, 166, 200, 1), //78a6c8
+                          elevation: 20,
+                          label: const Text(
+                            "انهاء",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          icon: const Icon(
+                            Icons.close,
+                            size: 40,
+                            color: Color.fromRGBO(233, 238, 244, 1),
+                          ),
+                          onPressed: () {
+                            if (cubit.formkey.currentState!.validate()) {
+                              if (cubit.sellsOrReturns == true) {
+                                cubit.addToList();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Returns()),
+                                );
+                              } else {
+                                cubit.addToList();
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                    '/', (Route<dynamic> route) => false);
                               }
-                            }),
-                      ),
-                    )
-                  ],
-                ),
+                            }
+                          }),
+                    ),
+                  )
+                ],
               ),
             ),
           );

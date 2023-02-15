@@ -1,6 +1,8 @@
 //
 // ignore_for_file: deprecated_member_use
 //import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -219,10 +221,55 @@ class _BillScreenState extends State<BillScreen> {
                 child: Row(
                   children: [
                     InkWell(
-                      onTap: () {
-                        
-                        
-                        cubit.addRecords();
+                      onTap: () async {
+                        //cubit.loadData();
+                        // cubit.itemsCollectionRef.get().then((snapshot) {
+                        //   snapshot.docs.forEach((doc) {
+                        //     //cubit.fireStoreData.add(doc.data());
+                        //     print(doc["items"][1]);
+                        //     print(doc.exists);
+                        //   });
+
+                        // });
+
+                        // final QuerySnapshot result =
+                        //     await cubit.collection1.get();
+                        // final List<DocumentSnapshot> documents = result.docs;
+                        // documents.forEach(
+                        //     (doc) => debugPrint(doc.data().toString()));
+                        //Second, make iterator to get all document from fireStore
+                        // cubit.collection1.get().then((QuerySnapshot snapshot) {
+                        //   snapshot.docs.forEach((DocumentSnapshot document) {
+                        //     cubit.fireStoreData.add(document.data() as Map);
+                        //     debugPrint(document.toString());
+                        //   });
+                        // });
+
+                        // cubit.collection1.get().then((snapshot) {
+                        //   snapshot.docs.forEach((doc) async {
+                        //     Map<String, dynamic> fromFirestore(
+                        //         Map<String, dynamic> data) {
+                        //       debugPrint(data.toString());
+                        //       return data;
+                        //     }
+                        //   });
+                        // });
+
+                        // cubit.collection1.get().then((QuerySnapshot snapshot) {
+                        //   snapshot.docs.map((DocumentSnapshot document) {
+                        //     return document.data();
+                        //   }).toList();
+                        //   debugPrint(document.toString());
+                        // });
+
+                        // cubit.collection1.get().then((QuerySnapshot snapshot) {
+                        //   snapshot.docs.forEach((DocumentSnapshot document) {
+                        //     Map<String,dynamic> data = document.data();
+                        //     cubit.fireStoreData.add(data);
+                        //   });
+                        // });
+
+                        //cubit.addRecords();
                         cubit.sellsOrReturns = false;
                         cubit.trueDate();
                         Navigator.push(
@@ -303,6 +350,8 @@ class _BillScreenState extends State<BillScreen> {
                                                             120, 166, 200, 1)),
                                                 child: const Text('نسبة'),
                                                 onPressed: () {
+                                                  cubit.valueOrPercntage =
+                                                      false;
                                                   if (cubit
                                                           .formkey.currentState!
                                                           .validate() &&
@@ -337,6 +386,7 @@ class _BillScreenState extends State<BillScreen> {
                                                             120, 166, 200, 1)),
                                                 child: const Text('قيمة'),
                                                 onPressed: () {
+                                                  cubit.valueOrPercntage = true;
                                                   if (cubit
                                                           .formkey.currentState!
                                                           .validate() &&
@@ -357,7 +407,7 @@ class _BillScreenState extends State<BillScreen> {
                                                     });
 
                                                     Navigator.pop(context);
-                                                    cubit.discountCon.clear();
+                                                    // cubit.discountCon.clear();
                                                     debugPrint(
                                                         cubit.dis.toString());
                                                   }
@@ -521,6 +571,7 @@ class _BillScreenState extends State<BillScreen> {
                                                                               style: ElevatedButton.styleFrom(backgroundColor: const Color.fromRGBO(120, 166, 200, 1)),
                                                                               child: const Text('DELETE'),
                                                                               onPressed: () {
+
                                                                                 Navigator.pop(context);
                                                                                 cubit.del(index);
                                                                               });
@@ -639,7 +690,7 @@ class _BillScreenState extends State<BillScreen> {
                                     ),
                                   ),
                                   Text(
-                                    "Discount: ${cubit.dis == 0 ? "" : cubit.dis.toString()}%",
+                                    "Discount:${cubit.dis == 0 ? "" : cubit.valueOrPercntage == true ? ((num.parse(cubit.discountCon.text) / cubit.totalBefor) * 100).toStringAsFixed(2) : cubit.dis.toString()}%",
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -647,7 +698,7 @@ class _BillScreenState extends State<BillScreen> {
                                     ),
                                   ),
                                   Text(
-                                      "Discount: ${cubit.dis == 0 ? "" : totalFormatter.format(((cubit.dis / 100) * cubit.totalBefor)).toString()}",
+                                      "Discount: ${cubit.dis == 0 ? "" : cubit.valueOrPercntage == true ? cubit.discountCon.text : totalFormatter.format(((cubit.dis / 100) * cubit.totalBefor)).toString()}",
                                       style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold,
@@ -963,6 +1014,11 @@ class _BillScreenState extends State<BillScreen> {
               Builder(builder: ((context) {
                 return ListTile(
                   onTap: () {
+                    // Fluttertoast.showToast(
+                    //   msg: "under development",
+                    //   toastLength: Toast.LENGTH_LONG,
+                    //   gravity: ToastGravity.CENTER,
+                    // );
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const Returns()),

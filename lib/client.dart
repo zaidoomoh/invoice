@@ -24,11 +24,8 @@ class _ClientState extends State<Client> {
         builder: (context, state) {
           var cubit = BlocProvider.of<InvoiceCubit>(context);
 
-          TextEditingController editClientName =TextEditingController
-              ();
-          TextEditingController editPhone =
-              TextEditingController
-              ();
+          TextEditingController editClientName = TextEditingController();
+          TextEditingController editPhone = TextEditingController();
 
           return Scaffold(
               appBar: AppBar(
@@ -39,6 +36,7 @@ class _ClientState extends State<Client> {
                         width: 250,
                         height: 10,
                         child: TextFormField(
+                          style: const TextStyle(color: Colors.white),
                           controller: cubit.clientsFilteringController,
                           onChanged: (value) {
                             cubit.filtering(value, "clients");
@@ -75,232 +73,165 @@ class _ClientState extends State<Client> {
               body: cubit.filteredClients.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemBuilder: ((context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 15, left: 15, right: 15),
-                              child: InkWell(
-                                onTap: () {
-                                  cubit.clientName(index);
-                                 
-                                  Navigator.pop(context);
-                                },
-                                onLongPress: () {
-                                   
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return Wrap(children: <Widget>[
-                                        AlertDialog(
-                                          title: const Text('المزيد'),
-                                          content: Form(
-                                            child: Column(children: [
-                                              ListTile(
-                                                title: const Text(
-                                                    "اظهار الرقم"),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                        context) {
-                                                      return Wrap(
-                                                        children: [
-                                                          AlertDialog(
-                                                            title: const Text(
-                                                                "الرقم هو"),
-                                                            content: Text(cubit
-                                                                        .clients[
-                                                                    index][
-                                                                "phone_number"]),
-                                                            actions: [
-                                                              ElevatedButton(
-                                                                style: ElevatedButton.styleFrom(
-                                                                    backgroundColor: const Color.fromRGBO(
-                                                                        120,
-                                                                        166,
-                                                                        200,
-                                                                        1)),
-                                                                child: const Text(
-                                                                    'CANCEL'),
-                                                                onPressed:
-                                                                    () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                              ),
-                                                            ],
-                                                          )
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                              ),
-                                              ListTile(
-                                                title: const Text("تعديل"),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                        context) {
-                                                      return Wrap(
-                                                        children: [
-                                                          AlertDialog(
-                                                            title:
-                                                                const Text(
-                                                                    "تعديل"),
-                                                            content: Form(
-                                                                child:
-                                                                    Column(
-                                                              children: [
-                                                                defaultTextFormFeild(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  controller:
-                                                                      editClientName,
-                                                                  type: TextInputType
-                                                                      .name,
-                                                                  label:
-                                                                      "Name",
-                                                                  prefix: Icons
-                                                                      .abc,
-                                                                  onChange:
-                                                                      () {},
-                                                                  onSubmit:
-                                                                      () {},
-                                                                  textInputFormatter:
-                                                                      FilteringTextInputFormatter.deny(
-                                                                          r'[]'),
-                                                                ),
-                                                                const SizedBox(
-                                                                  height:
-                                                                      10,
-                                                                ),
-                                                                defaultTextFormFeild(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  controller:
-                                                                      editPhone,
-                                                                  type: TextInputType
-                                                                      .number,
-                                                                  label:
-                                                                      "Phone",
-                                                                  prefix: Icons
-                                                                      .phone,
-                                                                  textInputFormatter:
-                                                                      FilteringTextInputFormatter.allow(
-                                                                          RegExp(r'[0-9]')),
-                                                                  onChange:
-                                                                      () {},
-                                                                  onSubmit:
-                                                                      () {},
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemBuilder: ((context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 15, left: 15, right: 15),
+                                child: InkWell(
+                                  onTap: () {
+                                    cubit.clientName(index);
+                                    Navigator.pop(context);
+                                  },
+                                  onLongPress: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Wrap(children: <Widget>[
+                                          AlertDialog(
+                                            title: const Text('المزيد'),
+                                            content: Form(
+                                              child: Column(children: [
+                                                ListTile(
+                                                  title:
+                                                      const Text("اظهار الرقم"),
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return Wrap(
+                                                          children: [
+                                                            AlertDialog(
+                                                              title: const Text(
+                                                                  "الرقم هو"),
+                                                              content: Text(cubit
+                                                                          .clients[
+                                                                      index][
+                                                                  "phone_number"]),
+                                                              actions: [
+                                                                ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor: const Color
+                                                                              .fromRGBO(
+                                                                          120,
+                                                                          166,
+                                                                          200,
+                                                                          1)),
+                                                                  child: const Text(
+                                                                      'CANCEL'),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
                                                                 ),
                                                               ],
-                                                            )),
-                                                            actions: [
-                                                              ElevatedButton(
-                                                                style: ElevatedButton.styleFrom(
-                                                                    backgroundColor: const Color.fromRGBO(
-                                                                        120,
-                                                                        166,
-                                                                        200,
-                                                                        1)),
-                                                                child: const Text(
-                                                                    'SAVE'),
-                                                                onPressed:
-                                                                    () {
-
-                                                                  cubit.updateClients(
-                                                                      number: editPhone
-                                                                          .text.toString(),
-                                                                      name: editClientName
-                                                                          .text,
-                                                                      id: cubit.clients[index]
-                                                                          [
-                                                                          'client_id']);
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                   
-                                                                },
-                                                              ),
-                                                            ],
-                                                          )
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                              )
-                                            ]),
-                                          ),
-                                          actions: <Widget>[
-                                            ElevatedButton(
-                                              style:
-                                                  ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                          const Color
-                                                                  .fromRGBO(
-                                                              120,
-                                                              166,
-                                                              200,
-                                                              1)),
-                                              child: const Text('CANCEL'),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ]);
-                                    },
-                                  );
-                                },
-                                child: Dismissible(
-                                  key:
-                                      UniqueKey(), //Key(cubit.clients[index].toString()),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 30,
-                                        child: Container(
-                                            decoration: const BoxDecoration(
-                                          image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/user.png"),
-                                              fit: BoxFit.fill),
-                                        )),
-                                      ),
-                                      Text(
-                                        cubit.filteredClients[index]
-                                            ["client_name"],
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w900),
-                                      )
-                                    ],
-                                  ),
-                                  onDismissed: (direction) {
-                                    showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Wrap(children: <Widget>[
-                                      StatefulBuilder(
-                                        builder: (BuildContext context,
-                                            void Function(void Function())
-                                                setState) {
-                                          return AlertDialog(
-                                            title:
-                                                const Text('  هل تريد حذف هذا العميل '),
-                                            content: Form(
-                                              key: cubit.formkey,
-                                              child: Column(children: []),
+                                                            )
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  title: const Text("تعديل"),
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return Wrap(
+                                                          children: [
+                                                            AlertDialog(
+                                                              title: const Text(
+                                                                  "تعديل"),
+                                                              content: Form(
+                                                                  child: Column(
+                                                                children: [
+                                                                  defaultTextFormFeild(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    controller:
+                                                                        editClientName,
+                                                                    type: TextInputType
+                                                                        .name,
+                                                                    label:
+                                                                        "Name",
+                                                                    prefix: Icons
+                                                                        .abc,
+                                                                    onChange:
+                                                                        () {},
+                                                                    onSubmit:
+                                                                        () {},
+                                                                    textInputFormatter:
+                                                                        FilteringTextInputFormatter.deny(
+                                                                            r'[]'),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  defaultTextFormFeild(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    controller:
+                                                                        editPhone,
+                                                                    type: TextInputType
+                                                                        .number,
+                                                                    label:
+                                                                        "Phone",
+                                                                    prefix: Icons
+                                                                        .phone,
+                                                                    textInputFormatter:
+                                                                        FilteringTextInputFormatter.allow(
+                                                                            RegExp(r'[0-9]')),
+                                                                    onChange:
+                                                                        () {},
+                                                                    onSubmit:
+                                                                        () {},
+                                                                  ),
+                                                                ],
+                                                              )),
+                                                              actions: [
+                                                                ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor: const Color
+                                                                              .fromRGBO(
+                                                                          120,
+                                                                          166,
+                                                                          200,
+                                                                          1)),
+                                                                  child:
+                                                                      const Text(
+                                                                          'SAVE'),
+                                                                  onPressed:
+                                                                      () {
+                                                                    cubit.updateClients(
+                                                                        number: editPhone
+                                                                            .text
+                                                                            .toString(),
+                                                                        name: editClientName
+                                                                            .text,
+                                                                        id: cubit.clients[index]
+                                                                            [
+                                                                            'client_id']);
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            )
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                )
+                                              ]),
                                             ),
                                             actions: <Widget>[
                                               ElevatedButton(
@@ -311,54 +242,116 @@ class _ClientState extends State<Client> {
                                                 child: const Text('CANCEL'),
                                                 onPressed: () {
                                                   Navigator.pop(context);
-                                                  
                                                 },
                                               ),
-                                              Builder(builder: (context) {
-                                                return ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                const Color
-                                                                        .fromRGBO(
-                                                                    120,
-                                                                    166,
-                                                                    200,
-                                                                    1)),
-                                                    child: const Text('SAVE'),
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                       cubit.deleteFromDB(
-                                        id: cubit.clients[index]["client_id"],
-                                        tableName: "clients",
-                                        columnName: "client_id"
-
-                                        
-                                        
-                                        );
-                                                    });
-                                              }),
                                             ],
-                                          );
+                                          ),
+                                        ]);
+                                      },
+                                    );
+                                  },
+                                  child: Dismissible(
+                                    key:
+                                        UniqueKey(), //Key(cubit.clients[index].toString()),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 30,
+                                          child: Container(
+                                              decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: AssetImage(
+                                                    "assets/user.png"),
+                                                fit: BoxFit.fill),
+                                          )),
+                                        ),
+                                        Text(
+                                          cubit.filteredClients[index]
+                                              ["client_name"],
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w900),
+                                        )
+                                      ],
+                                    ),
+                                    onDismissed: (direction) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return Wrap(children: <Widget>[
+                                            StatefulBuilder(
+                                              builder: (BuildContext context,
+                                                  void Function(void Function())
+                                                      setState) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                      '  هل تريد حذف هذا العميل '),
+                                                  content: Form(
+                                                    key: cubit.formkey,
+                                                    child: Column(children: []),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  const Color
+                                                                          .fromRGBO(
+                                                                      120,
+                                                                      166,
+                                                                      200,
+                                                                      1)),
+                                                      child:
+                                                          const Text('CANCEL'),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    Builder(builder: (context) {
+                                                      return ElevatedButton(
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                                  backgroundColor:
+                                                                      const Color
+                                                                              .fromRGBO(
+                                                                          120,
+                                                                          166,
+                                                                          200,
+                                                                          1)),
+                                                          child: const Text(
+                                                              'SAVE'),
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                            cubit.deleteFromDB(
+                                                                id: cubit.clients[
+                                                                        index][
+                                                                    "client_id"],
+                                                                tableName:
+                                                                    "clients",
+                                                                columnName:
+                                                                    "client_id");
+                                                          });
+                                                    }),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ]);
                                         },
-                                      ),
-                                    ]);
-                                  },
-                                );
-
-                                    
-                                   
-                               
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          }),
-                          itemCount: cubit.filteredClients.length,
-                        ),
-                      )
-                    ],
-                  ),
+                              );
+                            }),
+                            itemCount: cubit.filteredClients.length,
+                          ),
+                        )
+                      ],
+                    ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.startFloat,
               floatingActionButton: Row(

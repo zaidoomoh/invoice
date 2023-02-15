@@ -9,11 +9,10 @@ import 'states.dart';
 //   super.initState();
 //   futureAlbum = fetchAlbum2();
 //   createDatabase();
-  // initializeDB(subjectsTable);
-   // initializeDB(billsTable);
-   // subjectsOnList();
+// initializeDB(subjectsTable);
+// initializeDB(billsTable);
+// subjectsOnList();
 // }
-
 
 class home extends StatelessWidget {
   @override
@@ -24,7 +23,8 @@ class home extends StatelessWidget {
         var cubit = BlocProvider.of<InvoiceCubit>(context);
 
         return MaterialApp(
-          home: Scaffold(
+          home: Stack(children: [
+            Scaffold(
               body: //const BillScreen(),
                   cubit.screens[cubit.bottomBarIndx],
               // appBar: AppBar(
@@ -57,35 +57,38 @@ class home extends StatelessWidget {
               //     backgroundColor: Color.fromRGBO(32, 67, 89, 1),
               //     title: Title(
               //         color: Colors.cyan, child: const Text('Bill maker'))),
-              bottomNavigationBar: BottomNavigationBar(
-                  backgroundColor: Color.fromRGBO(230, 92, 79, 1),
-                  type: BottomNavigationBarType.fixed,
-                  currentIndex: cubit.bottomBarIndx,
-                  onTap: (index) {
-                    cubit.calculateDayTotal();
-                    cubit.changeScreenIndex(index);
+              bottomNavigationBar: BottomAppBar(
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                shape: const CircularNotchedRectangle(),
+                child: BottomNavigationBar(
+                    backgroundColor: const Color.fromRGBO(230, 92, 79, 1),
+                    type: BottomNavigationBarType.fixed,
+                    currentIndex: cubit.bottomBarIndx,
+                    onTap: (index) {
+                      cubit.calculateDayTotal();
+                      cubit.changeScreenIndex(index);
 
-                    debugPrint(cubit.items.toString());
-                  },
-                  elevation: 20,
-                  selectedFontSize: 15,
-                  unselectedFontSize: 13,
-                  iconSize: 32,
-                  selectedItemColor: Color.fromRGBO(32, 67, 89, 1),
-                  items: const [
-                    BottomNavigationBarItem(
-
-                      icon: Icon(
-                        Icons.new_label,
-                        color: Color.fromRGBO(32, 67, 89, 1),
+                      debugPrint(cubit.items.toString());
+                    },
+                    elevation: 20,
+                    selectedFontSize: 15,
+                    unselectedFontSize: 13,
+                    iconSize: 32,
+                    selectedItemColor: Color.fromRGBO(32, 67, 89, 1),
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Icon(
+                          Icons.new_label,
+                          color: Color.fromRGBO(32, 67, 89, 1),
+                        ),
+                        label: 'NEW',
                       ),
-                      label: 'NEW',
-                    ),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.history,
-                            color: Color.fromRGBO(32, 67, 89, 1)),
-                        label: 'HISTORY'),
-                  ]),
+                      BottomNavigationBarItem(
+                          icon: Icon(Icons.history,
+                              color: Color.fromRGBO(32, 67, 89, 1)),
+                          label: 'HISTORY'),
+                    ]),
+              ),
               // drawer: Drawer(
               //   child: ListView(padding: EdgeInsets.zero, children: [
               //     InkWell(
@@ -141,11 +144,8 @@ class home extends StatelessWidget {
               //     }),
               //   ]),
               // ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
-              floatingActionButton: Row(
-                children: const <Widget>[],
-              )),
+            ),
+          ]),
         );
       },
     );

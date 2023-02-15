@@ -38,7 +38,7 @@ class _TestState extends State<Test> {
     return MultiBlocProvider(providers: [
       
        BlocProvider(
-        create: (BuildContext context) => InvoiceCubit()..createDatabase()..calculateDayTotal(),),
+        create: (BuildContext context) => InvoiceCubit()..createDatabase()..calculateDayTotal()..loadData(),),
         // BlocProvider(
         // create: (BuildContext context) => InvoiceCubit()..getItems(),),
         
