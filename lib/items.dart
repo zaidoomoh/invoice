@@ -89,7 +89,7 @@ class _TestState extends State<Items> {
           body: cubit.filterdFireStoreData.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : SafeArea(
-                child: Column(
+                  child: Column(
                     children: [
                       Expanded(
                         child: ListView.builder(
@@ -99,19 +99,19 @@ class _TestState extends State<Items> {
                               // return
                               //  SizedBox(
                               //   height: 50,
-                                
+
                               //   child: Card(
                               //     child: Row(children: [
                               //       Text(cubit.filterdFireStoreData[index]["item_desc"],
                               //       style:const TextStyle(fontSize: 20,fontWeight:FontWeight.bold) ,),
-                                    
+
                               //     ],)
                               //   ));
-              
+
                               return Dismissible(
                                 key: UniqueKey(),
                                 onDismissed: (direction) {
-                                  setState((){});
+                                  setState(() {});
                                   // showDialog(
                                   //   context: context,
                                   //   builder: (context) {
@@ -168,7 +168,6 @@ class _TestState extends State<Items> {
                                   //     ]);
                                   //   },
                                   // );
-                                  
                                 },
                                 child: Card(
                                   child: ListTile(
@@ -183,38 +182,39 @@ class _TestState extends State<Items> {
                                       ],
                                     ),
                                     onTap: () async {
-                                      if (cubit.sellsOrReturns == true) {
-                                        /*returns*/
-                                        cubit.priceEditingController =
-                                            TextEditingController(
-                                                text: cubit.filterdFireStoreData[index]["price"]
-                                                    .toString());//new
-                                        cubit.allReturnsItems
-                                            .add(cubit.fireStoreData[index]);
-                                        cubit.currentReturnsItem
-                                            .add(cubit.fireStoreData[index]);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const AddItems()),
-                                        );
-                                      } else {
-                                        cubit.priceEditingController =
-                                            TextEditingController(
-                                                text: cubit.filterdFireStoreData[index]["price"]
-                                                    .toString());
-                                        cubit.allAddedItems
-                                            .add(cubit.filterdFireStoreData[index]);
-                                        cubit.currentAddedItem
-                                            .add(cubit.filterdFireStoreData[index]);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const AddItems()),
-                                        );
-                                      }
+                                      // if (cubit.sellsOrReturns == true) {
+                                      //   /*returns*/
+                                      //   cubit.priceEditingController =
+                                      //       TextEditingController(
+                                      //           text: cubit.filterdFireStoreData[index]["price"]
+                                      //               .toString());//new
+                                      //   cubit.allReturnsItems
+                                      //       .add(cubit.fireStoreData[index]);
+                                      //   cubit.currentReturnsItem
+                                      //       .add(cubit.fireStoreData[index]);
+                                      //   Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             const AddItems()),
+                                      //   );
+                                      // }
+                                      cubit.priceEditingController =
+                                          TextEditingController(
+                                              text: cubit
+                                                  .filterdFireStoreData[index]
+                                                      ["price"]
+                                                  .toString());
+                                      cubit.allAddedItems.add(
+                                          cubit.filterdFireStoreData[index]);
+                                      cubit.currentAddedItem.add(
+                                          cubit.filterdFireStoreData[index]);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AddItems()),
+                                      );
                                     },
                                     // onLongPress: () {
                                     //   showDialog(
@@ -310,8 +310,7 @@ class _TestState extends State<Items> {
                       ),
                     ],
                   ),
-              ),
-          
+                ),
         );
       },
     );

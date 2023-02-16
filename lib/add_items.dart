@@ -31,8 +31,7 @@ class _AddItemsState extends State<AddItems> {
               Navigator.pop(context);
               cubit.allAddedItems.removeLast();
               cubit.currentAddedItem.removeLast();
-              cubit.priceEditingController =
-                  TextEditingController(text: "1");
+              cubit.priceEditingController = TextEditingController(text: "1");
               return true;
             },
             child: Scaffold(
@@ -58,19 +57,13 @@ class _AddItemsState extends State<AddItems> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                cubit.sellsOrReturns == true
-                                    ? cubit.currentReturnsItem[0]["item_desc"]
-                                    : cubit.currentAddedItem[0]["item_desc"],
+                                cubit.currentAddedItem[0]["item_desc"],
                                 style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                  cubit.sellsOrReturns == true
-                                      ? (cubit.currentReturnsItem[0]["price"])
-                                          .toString()
-                                      : (cubit.currentAddedItem[0]["price"])
-                                          .toString(),
+                                  (cubit.currentAddedItem[0]["price"])
+                                      .toString(),
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold))
@@ -91,8 +84,7 @@ class _AddItemsState extends State<AddItems> {
                           onPressed: () {
                             setState(() {
                               cubit.quantityController.text.isNotEmpty
-                                  ? num.parse(cubit.quantityController.text) >
-                                          1
+                                  ? num.parse(cubit.quantityController.text) > 1
                                       ? cubit.quantityController.text =
                                           (num.parse(cubit.quantityController
                                                       .text) -
@@ -121,9 +113,8 @@ class _AddItemsState extends State<AddItems> {
                           onChange: () {},
                           label: "الكميه",
                           prefix: Icons.numbers,
-                          textInputFormatter:
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'[0-9 .]')),
+                          textInputFormatter: FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9 .]')),
                         ),
                       ),
                       Padding(
@@ -132,8 +123,7 @@ class _AddItemsState extends State<AddItems> {
                           onPressed: () {
                             setState(() {
                               cubit.quantityController.text.isNotEmpty
-                                  ? cubit
-                                      .quantityController.text = (num.parse(
+                                  ? cubit.quantityController.text = (num.parse(
                                               cubit.quantityController.text) +
                                           1)
                                       .toString()
@@ -227,18 +217,19 @@ class _AddItemsState extends State<AddItems> {
                           ),
                           onPressed: () {
                             if (cubit.formkey.currentState!.validate()) {
-                              if (cubit.sellsOrReturns == true) {
-                                cubit.addToList();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const Returns()),
-                                );
-                              } else {
+                              // if (cubit.sellsOrReturns == true) {
+                              //   cubit.addToList();
+                              //   Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => const Returns()),
+                              //   );
+                              //} 
+                               
                                 cubit.addToList();
                                 Navigator.of(context).pushNamedAndRemoveUntil(
                                     '/', (Route<dynamic> route) => false);
-                              }
+                              
                             }
                           }),
                     ),

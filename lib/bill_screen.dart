@@ -127,7 +127,9 @@ class _BillScreenState extends State<BillScreen> {
                           MediaQuery.of(context).padding.top) *
                       0.1,
                   smallConWedth: MediaQuery.of(context).size.width,
-                  text: 'INVOICE #:${formatter.format(cubit.getInvoiceNum())}',
+                  text: cubit.sellsOrReturns == 1
+                      ? 'INVOICE #:${formatter.format(cubit.getInvoiceNum())}'
+                      : 'RETURN #:${formatter.format(cubit.getReturnNum())}',
                   text1: cubit.formattedDate,
                   fontColor: Colors.grey,
                   onTap: () {}),
@@ -270,7 +272,8 @@ class _BillScreenState extends State<BillScreen> {
                         // });
 
                         //cubit.addRecords();
-                        cubit.sellsOrReturns = false;
+                        //cubit.sellsOrReturns = false;
+                        cubit.getReturnNum();
                         cubit.trueDate();
                         Navigator.push(
                           context,
@@ -571,7 +574,6 @@ class _BillScreenState extends State<BillScreen> {
                                                                               style: ElevatedButton.styleFrom(backgroundColor: const Color.fromRGBO(120, 166, 200, 1)),
                                                                               child: const Text('DELETE'),
                                                                               onPressed: () {
-
                                                                                 Navigator.pop(context);
                                                                                 cubit.del(index);
                                                                               });
@@ -717,9 +719,10 @@ class _BillScreenState extends State<BillScreen> {
                                         cubit.quantity.isNotEmpty &&
                                         cubit.totalOfItem.isNotEmpty) {
                                       cubit.insertToInvoiceInfo(
+                                          type: cubit.sellsOrReturns,
                                           clientId: cubit.client_id,
                                           notes: "",
-                                          invoiceNumber: cubit.getInvoiceNum(),
+                                          invoiceNumber:cubit.sellsOrReturns==1?cubit.getInvoiceNum():cubit.getReturnNum(),
                                           invoiceDate:
                                               cubit.formattedDate.toString(),
                                           clientName: cubit.client_name,
@@ -756,7 +759,10 @@ class _BillScreenState extends State<BillScreen> {
                                               .allAddedItems
                                               .indexOf(element)]),
                                           tax: int.parse(cubit.dropdownValue),
-                                          invoiceNumber: cubit.getInvoiceNum(),
+                                          invoiceNumber:
+                                              cubit.sellsOrReturns == 1
+                                                  ? cubit.getInvoiceNum()
+                                                  : cubit.getReturnNum(),
                                           items: element["item_desc"],
                                         );
                                       });
@@ -1018,11 +1024,28 @@ class _BillScreenState extends State<BillScreen> {
                     //   msg: "under development",
                     //   toastLength: Toast.LENGTH_LONG,
                     //   gravity: ToastGravity.CENTER,
-                    // );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Returns()),
-                    );
+                    //);
+                    if (cubit.sellsOrReturns == -1) {
+                      setState(
+                        () {
+                          debugPrint(cubit.sellsOrReturns.toString());
+                          cubit.sellsOrReturns = 1;
+                          Navigator.pop(context);
+                          cubit.getInvoiceNum();
+                          debugPrint(cubit.sellsOrReturns.toString());
+                        },
+                      );
+                    } else {
+                      setState(
+                        () {
+                          debugPrint(cubit.sellsOrReturns.toString());
+                          cubit.sellsOrReturns = -1;
+                          debugPrint(cubit.sellsOrReturns.toString());
+                        },
+                      );
+                      cubit.getReturnNum();
+                      Navigator.pop(context);
+                    }
                   },
                   title: const Text(
                     'المرتجعات',

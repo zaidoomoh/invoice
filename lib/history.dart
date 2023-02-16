@@ -53,7 +53,7 @@ class _HistoryState extends State<History> {
                                           ),
                                         )
                                       : Text(
-                                          "TOTAL:${totalFormatter.format(cubit.dayTotal).toString()}",
+                                          "TOTAL:${cubit.dayTotal.toStringAsFixed(2)}",
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
@@ -96,7 +96,7 @@ class _HistoryState extends State<History> {
                     ],
                   ),
                 ],
-                backgroundColor: Color.fromRGBO(32, 67, 89, 1),
+                backgroundColor: const Color.fromRGBO(32, 67, 89, 1),
               ),
               body: cubit.history.isEmpty
                   ? const Center(child: CircularProgressIndicator())
@@ -310,8 +310,8 @@ class _HistoryState extends State<History> {
                                           );
                                         },
                                         child: Card(
-                                          color:
-                                              Color.fromRGBO(233, 238, 244, 1),
+                                          color:cubit.history[index]["invoice_type"]==1?
+                                              const Color.fromRGBO(233, 238, 244, 1):const Color.fromRGBO(230, 92, 79, 1),
                                           child: ListTile(
                                             title: Row(
                                               mainAxisAlignment:
@@ -320,14 +320,35 @@ class _HistoryState extends State<History> {
                                               children: [
                                                 Text(cubit.history[index]
                                                         ['invoice_number']
-                                                    .toString()),
+                                                    .toString(),
+                                                    style: const TextStyle(
+                                                      fontSize:16,
+                                                      fontWeight: FontWeight.bold 
+                                                    ),
+                                                    ),
                                                 Text(cubit.history[index]
                                                         ['invoice_date']
-                                                    .toString()),
+                                                    .toString(),
+                                                    style: const TextStyle(
+                                                      fontSize:16,
+                                                      fontWeight: FontWeight.bold 
+                                                    ),
+                                                    ),
                                                 Text(
-                                                    "${cubit.history[index]['client_name'].toString()} "),
+                                                    "${cubit.history[index]['client_name'].toString()} ",
+                                                    
+                                                    style: const TextStyle(
+                                                      fontSize:16,
+                                                      fontWeight: FontWeight.bold 
+                                                    ),
+                                                    ),
                                                 Text(
-                                                    "${cubit.history[index]['total'].toStringAsFixed(2)} JD"),
+                                                    "${cubit.history[index]['total'].toStringAsFixed(2)} JD",
+                                                    style: const TextStyle(
+                                                      fontSize:16,
+                                                      fontWeight: FontWeight.bold 
+                                                    ),
+                                                    ),
                                               ],
                                             ),
                                             onTap: () async {},
