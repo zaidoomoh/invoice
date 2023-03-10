@@ -45,6 +45,7 @@ class _TestState extends State<Items> {
         TextEditingController editedItemNumber = TextEditingController();
         var cubit = BlocProvider.of<InvoiceCubit>(context);
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
               actions: [
                 Padding(
@@ -59,12 +60,18 @@ class _TestState extends State<Items> {
                         cubit.filtering(value, "items");
                       },
                       keyboardType: TextInputType.name,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: "Filtering",
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(
+                        prefixIcon: const Icon(Icons.filter_list),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              
+                              cubit.itemsFilteringController.clear();cubit.filtering("", "items");
+                            },
+                            icon: const Icon(Icons.clear)),
+                        border: const OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.black)),
-                        prefixIconColor: Color.fromRGBO(120, 166, 200, 1),
+                        prefixIconColor: const Color.fromRGBO(120, 166, 200, 1),
                       ),
                     ),
 
@@ -89,226 +96,235 @@ class _TestState extends State<Items> {
           body: cubit.filterdFireStoreData.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : SafeArea(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: cubit.filterdFireStoreData.length,
-                            itemBuilder: (context, index) {
-                              // return
-                              //  SizedBox(
-                              //   height: 50,
-
-                              //   child: Card(
-                              //     child: Row(children: [
-                              //       Text(cubit.filterdFireStoreData[index]["item_desc"],
-                              //       style:const TextStyle(fontSize: 20,fontWeight:FontWeight.bold) ,),
-
-                              //     ],)
-                              //   ));
-
-                              return Dismissible(
-                                key: UniqueKey(),
-                                onDismissed: (direction) {
-                                  setState(() {});
-                                  // showDialog(
-                                  //   context: context,
-                                  //   builder: (context) {
-                                  //     return Wrap(children: <Widget>[
-                                  //       StatefulBuilder(
-                                  //         builder: (BuildContext context,
-                                  //             void Function(void Function())
-                                  //                 setState) {
-                                  //           return AlertDialog(
-                                  //             title: const Text(
-                                  //                 '  هل تريد حذف هذه المادة'),
-                                  //             content: Form(
-                                  //               key: cubit.formkey,
-                                  //               child: Column(children: []),
-                                  //             ),
-                                  //             actions: <Widget>[
-                                  //               ElevatedButton(
-                                  //                 style: ElevatedButton.styleFrom(
-                                  //                     backgroundColor:
-                                  //                         const Color.fromRGBO(
-                                  //                             120, 166, 200, 1)),
-                                  //                 child: const Text('CANCEL'),
-                                  //                 onPressed: () {
-                                  //                   Navigator.pop(context);
-                                  //                 },
-                                  //               ),
-                                  //               Builder(builder: (context) {
-                                  //                 return ElevatedButton(
-                                  //                     style: ElevatedButton
-                                  //                         .styleFrom(
-                                  //                             backgroundColor:
-                                  //                                 const Color
-                                  //                                         .fromRGBO(
-                                  //                                     120,
-                                  //                                     166,
-                                  //                                     200,
-                                  //                                     1)),
-                                  //                     child: const Text('DELETE'),
-                                  //                     onPressed: () {
-                                  //                       Navigator.pop(context);
-                                  //                       cubit.deleteFromDB(
-                                  //                           id: cubit.filterdItems[
-                                  //                                   index]
-                                  //                               ["items_id"],
-                                  //                           tableName: "items",
-                                  //                           columnName:
-                                  //                               "items_id");
-                                  //                     });
-                                  //               }),
-                                  //             ],
-                                  //           );
-                                  //         },
-                                  //       ),
-                                  //     ]);
-                                  //   },
-                                  // );
-                                },
-                                child: Card(
-                                  child: ListTile(
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                            "${cubit.filterdFireStoreData[index]["item_desc"]} "),
-                                        Text(
-                                            "${cubit.filterdFireStoreData[index]["price"].toString()} JD"),
-                                      ],
-                                    ),
-                                    onTap: () async {
-                                      // if (cubit.sellsOrReturns == true) {
-                                      //   /*returns*/
-                                      //   cubit.priceEditingController =
-                                      //       TextEditingController(
-                                      //           text: cubit.filterdFireStoreData[index]["price"]
-                                      //               .toString());//new
-                                      //   cubit.allReturnsItems
-                                      //       .add(cubit.fireStoreData[index]);
-                                      //   cubit.currentReturnsItem
-                                      //       .add(cubit.fireStoreData[index]);
-                                      //   Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             const AddItems()),
-                                      //   );
-                                      // }
-                                      cubit.priceEditingController =
-                                          TextEditingController(
-                                              text: cubit
-                                                  .filterdFireStoreData[index]
-                                                      ["price"]
-                                                  .toString());
-                                      cubit.allAddedItems.add(
-                                          cubit.filterdFireStoreData[index]);
-                                      cubit.currentAddedItem.add(
-                                          cubit.filterdFireStoreData[index]);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AddItems()),
-                                      );
-                                    },
-                                    // onLongPress: () {
-                                    //   showDialog(
-                                    //     context: context,
-                                    //     builder: (BuildContext context) {
-                                    //       return Wrap(
-                                    //         children: [
-                                    //           AlertDialog(
-                                    //             title: const Text("تعديل"),
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                            debugPrint("done");
+                            setState(() {});
+                            cubit.addRecords3();
+                            return Future.delayed(const Duration(microseconds: 0));
+                          },
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: cubit.filterdFireStoreData.length,
+                              itemBuilder: (context, index) {
+                                // return
+                                //  SizedBox(
+                                //   height: 50,
+                  
+                                //   child: Card(
+                                //     child: Row(children: [
+                                //       Text(cubit.filterdFireStoreData[index]["item_desc"],
+                                //       style:const TextStyle(fontSize: 20,fontWeight:FontWeight.bold) ,),
+                  
+                                //     ],)
+                                //   ));
+                  
+                                return Dismissible(
+                                  key: UniqueKey(),
+                                  onDismissed: (direction) {
+                                    setState(() {});
+                                    // showDialog(
+                                    //   context: context,
+                                    //   builder: (context) {
+                                    //     return Wrap(children: <Widget>[
+                                    //       StatefulBuilder(
+                                    //         builder: (BuildContext context,
+                                    //             void Function(void Function())
+                                    //                 setState) {
+                                    //           return AlertDialog(
+                                    //             title: const Text(
+                                    //                 '  هل تريد حذف هذه المادة'),
                                     //             content: Form(
-                                    //                 child: Column(
-                                    //               children: [
-                                    //                 defaultTextFormFeild(
-                                    //                   color: Colors.black,
-                                    //                   controller: editItemName,
-                                    //                   type: TextInputType.name,
-                                    //                   label: "Name",
-                                    //                   prefix: Icons.abc,
-                                    //                   onChange: () {},
-                                    //                   onSubmit: () {},
-                                    //                   textInputFormatter:
-                                    //                       FilteringTextInputFormatter
-                                    //                           .deny(r'[]'),
-                                    //                 ),
-                                    //                 const SizedBox(
-                                    //                   height: 10,
-                                    //                 ),
-                                    //                 defaultTextFormFeild(
-                                    //                   color: Colors.black,
-                                    //                   controller: editItemPrice,
-                                    //                   type: TextInputType.number,
-                                    //                   label: "Price",
-                                    //                   prefix: Icons.money,
-                                    //                   textInputFormatter:
-                                    //                       FilteringTextInputFormatter
-                                    //                           .allow(RegExp(
-                                    //                               r'[0-9]')),
-                                    //                   onChange: () {},
-                                    //                   onSubmit: () {},
-                                    //                 ),
-                                    //                 const SizedBox(
-                                    //                   height: 10,
-                                    //                 ),
-                                    //                 // defaultTextFormFeild(
-                                    //                 //   color: Colors.black,
-                                    //                 //   controller: editedItemNumber,
-                                    //                 //   type: TextInputType.number,
-                                    //                 //   label: "Subject number",
-                                    //                 //   prefix: Icons.numbers,
-                                    //                 //   textInputFormatter:
-                                    //                 //       FilteringTextInputFormatter
-                                    //                 //           .allow(
-                                    //                 //               RegExp(r'[0-9]')),
-                                    //                 //   onChange: () {},
-                                    //                 //   onSubmit: () {},
-                                    //                 // ),
-                                    //               ],
-                                    //             )),
-                                    //             actions: [
+                                    //               key: cubit.formkey,
+                                    //               child: Column(children: []),
+                                    //             ),
+                                    //             actions: <Widget>[
                                     //               ElevatedButton(
-                                    //                 style:
-                                    //                     ElevatedButton.styleFrom(
-                                    //                         backgroundColor:
-                                    //                             const Color
-                                    //                                     .fromRGBO(
-                                    //                                 120,
-                                    //                                 166,
-                                    //                                 200,
-                                    //                                 1)),
-                                    //                 child: const Text('SAVE'),
+                                    //                 style: ElevatedButton.styleFrom(
+                                    //                     backgroundColor:
+                                    //                         const Color.fromRGBO(
+                                    //                             120, 166, 200, 1)),
+                                    //                 child: const Text('CANCEL'),
                                     //                 onPressed: () {
-                                    //                   cubit.updateSubjects(
-                                    //                       price:
-                                    //                           editItemPrice.text,
-                                    //                       name: editItemName.text,
-                                    //                       number:
-                                    //                           cubit.items[index]
-                                    //                               ["number"]);
                                     //                   Navigator.pop(context);
                                     //                 },
                                     //               ),
+                                    //               Builder(builder: (context) {
+                                    //                 return ElevatedButton(
+                                    //                     style: ElevatedButton
+                                    //                         .styleFrom(
+                                    //                             backgroundColor:
+                                    //                                 const Color
+                                    //                                         .fromRGBO(
+                                    //                                     120,
+                                    //                                     166,
+                                    //                                     200,
+                                    //                                     1)),
+                                    //                     child: const Text('DELETE'),
+                                    //                     onPressed: () {
+                                    //                       Navigator.pop(context);
+                                    //                       cubit.deleteFromDB(
+                                    //                           id: cubit.filterdItems[
+                                    //                                   index]
+                                    //                               ["items_id"],
+                                    //                           tableName: "items",
+                                    //                           columnName:
+                                    //                               "items_id");
+                                    //                     });
+                                    //               }),
                                     //             ],
-                                    //           )
-                                    //         ],
-                                    //       );
-                                    //     },
-                                    //   );
-                                    // },
+                                    //           );
+                                    //         },
+                                    //       ),
+                                    //     ]);
+                                    //   },
+                                    // );
+                                  },
+                                  child: Card(
+                                    child: ListTile(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                              "${cubit.filterdFireStoreData[index]["item_desc"]} "),
+                                          Text(
+                                              "${cubit.filterdFireStoreData[index]["price"].toString()} JD"),
+                                        ],
+                                      ),
+                                      onTap: () async {
+                                        // if (cubit.sellsOrReturns == true) {
+                                        //   /*returns*/
+                                        //   cubit.priceEditingController =
+                                        //       TextEditingController(
+                                        //           text: cubit.filterdFireStoreData[index]["price"]
+                                        //               .toString());//new
+                                        //   cubit.allReturnsItems
+                                        //       .add(cubit.fireStoreData[index]);
+                                        //   cubit.currentReturnsItem
+                                        //       .add(cubit.fireStoreData[index]);
+                                        //   Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //         builder: (context) =>
+                                        //             const AddItems()),
+                                        //   );
+                                        // }
+                                        cubit.priceEditingController =
+                                            TextEditingController(
+                                                text: cubit
+                                                    .filterdFireStoreData[index]
+                                                        ["price"]
+                                                    .toString());
+                                        cubit.allAddedItems.add(
+                                            cubit.filterdFireStoreData[index]);
+                                        cubit.currentAddedItem.add(
+                                            cubit.filterdFireStoreData[index]);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const AddItems()),
+                                        );
+                                      },
+                                      // onLongPress: () {
+                                      //   showDialog(
+                                      //     context: context,
+                                      //     builder: (BuildContext context) {
+                                      //       return Wrap(
+                                      //         children: [
+                                      //           AlertDialog(
+                                      //             title: const Text("تعديل"),
+                                      //             content: Form(
+                                      //                 child: Column(
+                                      //               children: [
+                                      //                 defaultTextFormFeild(
+                                      //                   color: Colors.black,
+                                      //                   controller: editItemName,
+                                      //                   type: TextInputType.name,
+                                      //                   label: "Name",
+                                      //                   prefix: Icons.abc,
+                                      //                   onChange: () {},
+                                      //                   onSubmit: () {},
+                                      //                   textInputFormatter:
+                                      //                       FilteringTextInputFormatter
+                                      //                           .deny(r'[]'),
+                                      //                 ),
+                                      //                 const SizedBox(
+                                      //                   height: 10,
+                                      //                 ),
+                                      //                 defaultTextFormFeild(
+                                      //                   color: Colors.black,
+                                      //                   controller: editItemPrice,
+                                      //                   type: TextInputType.number,
+                                      //                   label: "Price",
+                                      //                   prefix: Icons.money,
+                                      //                   textInputFormatter:
+                                      //                       FilteringTextInputFormatter
+                                      //                           .allow(RegExp(
+                                      //                               r'[0-9]')),
+                                      //                   onChange: () {},
+                                      //                   onSubmit: () {},
+                                      //                 ),
+                                      //                 const SizedBox(
+                                      //                   height: 10,
+                                      //                 ),
+                                      //                 // defaultTextFormFeild(
+                                      //                 //   color: Colors.black,
+                                      //                 //   controller: editedItemNumber,
+                                      //                 //   type: TextInputType.number,
+                                      //                 //   label: "Subject number",
+                                      //                 //   prefix: Icons.numbers,
+                                      //                 //   textInputFormatter:
+                                      //                 //       FilteringTextInputFormatter
+                                      //                 //           .allow(
+                                      //                 //               RegExp(r'[0-9]')),
+                                      //                 //   onChange: () {},
+                                      //                 //   onSubmit: () {},
+                                      //                 // ),
+                                      //               ],
+                                      //             )),
+                                      //             actions: [
+                                      //               ElevatedButton(
+                                      //                 style:
+                                      //                     ElevatedButton.styleFrom(
+                                      //                         backgroundColor:
+                                      //                             const Color
+                                      //                                     .fromRGBO(
+                                      //                                 120,
+                                      //                                 166,
+                                      //                                 200,
+                                      //                                 1)),
+                                      //                 child: const Text('SAVE'),
+                                      //                 onPressed: () {
+                                      //                   cubit.updateSubjects(
+                                      //                       price:
+                                      //                           editItemPrice.text,
+                                      //                       name: editItemName.text,
+                                      //                       number:
+                                      //                           cubit.items[index]
+                                      //                               ["number"]);
+                                      //                   Navigator.pop(context);
+                                      //                 },
+                                      //               ),
+                                      //             ],
+                                      //           )
+                                      //         ],
+                                      //       );
+                                      //     },
+                                      //   );
+                                      // },
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
-                      ),
-                    ],
+                                );
+                              }),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
         );

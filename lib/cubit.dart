@@ -1,5 +1,6 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,12 +11,39 @@ import 'package:sqlbrite/sqlbrite.dart';
 import 'bill_screen.dart';
 import 'history.dart';
 import 'states.dart';
+import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 
 class InvoiceCubit extends Cubit<InvoiceStates> {
   InvoiceCubit() : super(InvoiceInitStates());
 
   static InvoiceCubit get(context) => BlocProvider.of(context);
   num sellsOrReturns = 1;
+  //BIOMETRICS
+  final LocalAuthentication auth = LocalAuthentication();
+
+  bool _canCheckBiometrics = false;
+  String _authorizedOrNot = 'Not Authorized';
+
+  Future<void> checkBiometrics() async {
+    bool canCheckBiometrics = await auth.canCheckBiometrics;
+
+    _canCheckBiometrics = canCheckBiometrics;
+  }
+
+  Future<bool> authenticate() async {
+    bool authenticated = false;
+
+    try {
+      authenticated = await auth.authenticate(
+        localizedReason: 'Authenticate to access the app',
+      );
+    } catch (e) {
+      print(e);
+    }
+
+    return authenticated;
+  }
 
   //DATABASE SECTION //////////////////////////////////////////////////////////////
 
@@ -33,6 +61,8 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
       "CREATE TABLE settings(id INTEGER PRIMARY KEY AUTOINCREMENT,settings VARCHAR NOT NULL,settings_state INTEGER NOT NULL)";
   String unitsTable =
       "CREATE TABLE units(unit_id INTEGER PRIMARY KEY AUTOINCREMENT,unit VARCHAR NOT NULL)";
+  String expensesTable =
+      "CREATE TABLE expenses(expense_id INTEGER PRIMARY KEY AUTOINCREMENT,expense_desc VARCHAR NOT NULL,expense_price INTEGER NOT NULL,expense_date VARCHAR NOT NULL)";
   void _createSubjectsTable(Batch batch) {
     batch.execute(itemsTable);
     debugPrint(' table 1 created ');
@@ -71,19 +101,28 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     debugPrint(' table 6 created ');
   }
 
+  void _createExpensesTable(Batch batch) {
+    batch.execute(expensesTable);
+    debugPrint(' table 4 created ');
+  }
+
   List<Map> items = [];
   List<Map> clients = [];
-  List<Map> history = [];
+  List<Map> savedItemsInfo = [];
   List<Map> returnsMax = [];
   List<Map> sellsMax = [];
+  List<Map> infoIdMax = [];
+  List<Map> returnsInfoIdMax = [];
   List<Map> savedItems = [];
   List<Map> settingsList = [];
   List totalOfItem = [];
+  num expensesTotal = 0;
   List quantity = [];
   List priceOfItem = [];
   List dropDownUnitsList = [];
   List<int> taxLIst = <int>[0, 4, 8, 16];
   List<Map> unitsList = [];
+  List<Map> expensesList = [];
   late List<Map> allAddedItems = [];
   late List<Map> currentAddedItem = [];
 
@@ -98,6 +137,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
       _createInvoiceItemsTable(batch);
       _createSettingsTable(batch);
       _createUnitsTable(batch);
+      _createExpensesTable(batch);
       batch.commit();
     }, onOpen: (database) async {
       print("database opend");
@@ -125,14 +165,19 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
           debugPrint(element["unit"]);
           debugPrint(dropDownUnitsList.toString());
         }
-
+        emit(GetDatabase());
+      });
+      getDataFromDatabase(database, "expenses").then((value) {
+        expensesList = value;
+        calculateExpenses();
         emit(GetDatabase());
       });
       getDataFromInfoOrderdByDate(database, "invoice_info").then((value) {
-        history = filterdHistory = value;
+        savedItemsInfo = filterdsavedItemsInfo = value;
         emit(GetDatabase());
       }).then((value) {
         calculateDayTotal();
+        addTotal();
       });
       getReturnsMaxFromInfo(database).then((value) {
         returnsMax = value;
@@ -145,6 +190,12 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
         emit(GetDatabase());
       }).then((value) {
         debugPrint("sells${sellsMax.toString()}");
+      });
+      getInfoIdMaxFromInfo(database).then((value) {
+        infoIdMax = value;
+        emit(GetDatabase());
+      }).then((value) {
+        debugPrint("hereeeee${infoIdMax.toString()}");
       });
     });
     return Future.delayed(const Duration(microseconds: 0));
@@ -230,10 +281,16 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
           debugPrint("hereeeee${returnsMax.toString()}");
         });
         getDataFromInfoOrderdByDate(database, "invoice_info").then((value) {
-          history = filterdHistory = value;
+          savedItemsInfo = filterdsavedItemsInfo = value;
           emit(GetDatabase());
         }).then((value) {
           calculateDayTotal();
+        });
+        getInfoIdMaxFromInfo(database).then((value) {
+          infoIdMax = value;
+          emit(GetDatabase());
+        }).then((value) {
+          debugPrint("hereeeee${infoIdMax.toString()}");
         });
       });
 
@@ -261,7 +318,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
         getDataFromDatabase(database, "invoice_items").then((value) {
           savedItems = value;
-
+          debugPrint(savedItems.toString());
           emit(GetDatabase());
         });
       });
@@ -332,6 +389,30 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     return Future.delayed(const Duration(microseconds: 0));
   }
 
+  Future<List<Map>> insertToExpenses(
+      {required String expenseDesc,
+      required int expensePrice,
+      required String expenseDate}) async {
+    await database?.transaction((txn) {
+      txn
+          .rawInsert(
+              'INSERT INTO expenses(expense_desc,expense_price,expense_date) VALUES("$expenseDesc","$expensePrice","$expenseDate")')
+          .then((value) {
+        emit(InsertDatabase());
+        getDataFromDatabase(database, "expenses").then((value) {
+          expensesList = value;
+          calculateExpenses();
+          debugPrint(expensesTotal.toString());
+          emit(GetDatabase());
+        });
+      });
+
+      return Future.delayed(const Duration(microseconds: 0));
+    });
+    debugPrint(database.toString());
+    return Future.delayed(const Duration(microseconds: 0));
+  }
+
   Future<List<Map>> getDataFromDatabase(database, tableName) async {
     return database.rawQuery('SELECT * FROM $tableName ');
   }
@@ -349,6 +430,11 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   Future<List<Map>> getReturnsMaxFromInfo(database) async {
     return database.rawQuery(
         'SELECT MAX (invoice_number) AS "return_max" FROM invoice_info WHERE invoice_type =-1');
+  }
+
+  Future<List<Map>> getInfoIdMaxFromInfo(database) async {
+    return database
+        .rawQuery('SELECT MAX (info_id) AS "info_id_max" FROM invoice_info');
   }
 
   void updateSettings({required int state, required String name}) {
@@ -410,8 +496,19 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
         emit(GetDatabase());
       });
       getDataFromDatabase(database, "invoice_info").then((value) {
-        history = filterdHistory = value;
+        savedItemsInfo = filterdsavedItemsInfo = value;
         calculateDayTotal();
+        emit(GetDatabase());
+      });
+      getDataFromDatabase(database, "invoice_items").then((value) {
+        savedItems = value;
+        debugPrint(savedItems.toString());
+        emit(GetDatabase());
+      });
+      getDataFromDatabase(database, "expenses").then((value) {
+        expensesList = value;
+        calculateExpenses();
+        debugPrint(expensesTotal.toString());
         emit(GetDatabase());
       });
       calculateDayTotal();
@@ -439,8 +536,12 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
   //FIREBASE SECTION /////////////////////////////////////////////////////////////////
   bool valueOrPercntage = true;
+  final totalRef = FirebaseFirestore.instance.collection("total");
   final itemsCollectionRef = FirebaseFirestore.instance.collection("items");
   final historyCollectionRef = FirebaseFirestore.instance.collection("history");
+  final expensesCollectionRef =
+      FirebaseFirestore.instance.collection("expenses");
+
   List<Map> fireStoreData = [];
   List<Map> filterdFireStoreData = [];
   String? data;
@@ -474,6 +575,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   void addRecords3() {
     //itemsCollectionRef.add({"items": itemsRecords}).then((value) {
     itemsCollectionRef.get().then((value) {
+      fireStoreData.clear();
       value.docs.asMap().forEach((indx, element) {
         element.data()["items"].forEach((item) {
           debugPrint(item.toString());
@@ -483,6 +585,77 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
       });
     });
     //});
+  }
+
+  void addInvoices() {
+    List _items = [];
+    historyCollectionRef.doc().delete().then((value) {
+      savedItemsInfo.forEach((infoElement) {
+        Map<String, dynamic> newInfoElement =
+            Map<String, dynamic>.from(infoElement);
+        _items.clear();
+        savedItems.forEach((itemsElement) {
+          if (infoElement["info_id"] == itemsElement["info_id"]) {
+            _items.add(itemsElement);
+            newInfoElement["items"] = _items;
+          }
+        });
+        String parentDoc = infoElement["info_id"].toString();
+        DocumentReference parentDocRef = historyCollectionRef.doc(parentDoc);
+        parentDocRef.set(Map<String, dynamic>.from(newInfoElement));
+        // savedItems.forEach((itemsElement) {
+        //   String subCollection = itemsElement["invoice_items"];
+        //   CollectionReference subCollectionRef =
+        //       parentDocRef.collection(subCollection);
+        //   if (infoElement["info_id"] == itemsElement["info_id"]) {
+        //     subCollectionRef.add(Map<String, dynamic>.from(itemsElement));
+        //   }
+        // });
+      });
+    });
+    //historyCollectionRef.add({"history": savedItemsInfo}).then((value) {
+    // historyCollectionRef.get().then((value) {
+    //   fireStoreData.clear();
+    //   value.docs.asMap().forEach((indx, element) {
+    //     element.data()["items"].forEach((item) {
+    //       debugPrint(item.toString());
+    //       fireStoreData.add(item);
+    //       filterdFireStoreData = fireStoreData;
+    //     });
+    //   });
+    // });
+    // });
+  }
+
+  void addExpenses() {
+    expensesCollectionRef.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.delete();
+      });
+      expensesList.forEach((expenseElement) {
+        String docName = expenseElement["expense_id"].toString();
+        expensesCollectionRef
+            .doc()
+            .set(Map<String, dynamic>.from(expenseElement));
+      });
+    });
+    //expensesCollectionRef.doc().delete().then((value) {
+
+    //});
+  }
+
+  void addTotal() {
+    // totalRef.get().then((querySnapshot) {
+    //   querySnapshot.docs.forEach((doc) {
+    //     doc.reference.delete();
+    //   });
+    // });
+    calculateDayTotal();
+    calculateExpenses();
+    String _total = (dayTotal - expensesTotal).toStringAsFixed(2);
+    totalRef.doc().delete().then((value) {
+      totalRef.doc("total").set(Map<String, dynamic>.from({'total': _total}));
+    });
   }
 
 //void addRecords1(x) async {
@@ -656,6 +829,8 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     emit(ChangeCheckBox());
   }
 
+  //ANIMATION
+
   //CHECKBOX SECTION /////////////////////////////////////////////////////////////////
 
   late List<int> cc = [
@@ -669,16 +844,18 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   //CONTROLLERS SECTION /////////////////////////////////////////////////////////////
-  TextEditingController discountCon = TextEditingController(text: "1");
+  TextEditingController discountCon = TextEditingController();
   TextEditingController writeClientNameCon = TextEditingController();
   late TextEditingController priceEditingController = TextEditingController();
   TextEditingController quantityController = TextEditingController(text: "1");
   TextEditingController clientsFilteringController = TextEditingController();
   TextEditingController itemsFilteringController = TextEditingController();
   TextEditingController historyFilteringController = TextEditingController();
+  TextEditingController expenseDescController = TextEditingController();
+  TextEditingController expensePriceController = TextEditingController();
   //FILLTERING SECTION ///////////////////////////////////////////////////////////////
 
-  List<Map> filterdHistory = [];
+  List<Map> filterdsavedItemsInfo = [];
   List<Map> filterdItems = [];
   List<Map> filteredClients = [];
   void filtering(String enteredKeyword, list) {
@@ -693,8 +870,8 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
         filterdFireStoreData = results;
         emit(Filtering());
       } else {
-        results = history;
-        filterdHistory = results;
+        results = savedItemsInfo;
+        filterdsavedItemsInfo = results;
         emit(Filtering());
       }
     } else {
@@ -712,19 +889,16 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
                 .toLowerCase()
                 .contains(enteredKeyword.toLowerCase()))
             .toList();
-
         filterdFireStoreData = results;
         emit(Filtering());
       } else {
-        results = history
+        results = savedItemsInfo
             .where((user) => (user["invoice_date"])
                 .toString()
-                .substring(8)
                 .toLowerCase()
                 .contains(enteredKeyword.toString().toLowerCase()))
             .toList();
-        filterdHistory = results;
-
+        filterdsavedItemsInfo = results;
         emit(Filtering());
       }
     }
@@ -754,9 +928,9 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   int getInvoiceNum() {
-    debugPrint("length${history.length.toString()}");
+    debugPrint("length${savedItemsInfo.length.toString()}");
     debugPrint("sells${sellsMax.toString()}");
-    if (history.isEmpty) {
+    if (savedItemsInfo.isEmpty) {
       return 1;
     } else {
       getSellsMaxFromInfo(database);
@@ -771,7 +945,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   int getReturnNum() {
     getReturnsMaxFromInfo(database);
     debugPrint(returnsMax.toString());
-    if (returnsMax.isEmpty || returnsMax[0]["return_max"] == null) {
+    if (/*returnsMax.isEmpty ||*/ returnsMax[0]["return_max"] == null) {
       return 1;
     } else {
       return (returnsMax[0]["return_max"]) + 1;
@@ -779,10 +953,13 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   }
 
   int getInfoId() {
-    if (history.isEmpty) {
+    //if (sellsOrReturns == 1) {
+    getInfoIdMaxFromInfo(database);
+    debugPrint(infoIdMax[0]["info_id_max"].toString());
+    if (savedItemsInfo.isEmpty /*|| infoIdMax[0]["info_id_max"] == null*/) {
       return 1;
     } else {
-      return history[history.length - 1]["info_id"] + 1;
+      return (infoIdMax[0]["info_id_max"] + 1);
     }
   }
 
@@ -795,9 +972,17 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     return totalBefor;
   }
 
+  num calculateExpenses() {
+    expensesTotal = 0;
+    expensesList.forEach((element) {
+      expensesTotal += element["expense_price"];
+    });
+    return expensesTotal;
+  }
+
   num calculateDayTotal() {
     dayTotal = 0;
-    for (var element in history) {
+    for (var element in savedItemsInfo) {
       dayTotal += (element["total"]);
     }
     return dayTotal;
@@ -805,10 +990,11 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
   void afterSave() {
     debugPrint(sellsOrReturns.toString());
-    debugPrint(history.toString());
+    debugPrint(savedItemsInfo.toString());
     debugPrint(savedItems.toString());
     getInvoiceNum();
     getReturnNum();
+    getInfoIdMaxFromInfo(database);
     allAddedItems.clear();
     totalOfItem.clear();
     priceOfItem.clear();
@@ -820,7 +1006,7 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
     dis = 0;
     //savedItemsIndx = 0;
     writeClientNameCon.clear();
-    sellsOrReturns = 1;
+    //sellsOrReturns = 1;
     debugPrint(sellsOrReturns.toString());
     emit(AfterSaveInvoice());
   }
@@ -830,22 +1016,21 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
   showSavedItems(index) {
     saved.clear();
     for (var element in savedItems) {
-      if (element["invoice_num"].toString() ==
-          filterdHistory[index]["invoice_number"].toString()) {
+      if (element["info_id"].toString() ==
+          filterdsavedItemsInfo[index]["info_id"].toString()) {
         saved.add(element);
       }
     }
-    debugPrint(saved.toString());
   }
 
-  isExist(controller, BuildContext context) {
-    for (var element in items) {
-      if (controller.text == element["item_num"]) {
-        continue;
-      }
-    }
-    return true;
-  }
+  // isExist(controller, BuildContext context) {
+  //   for (var element in items) {
+  //     if (controller.text == element["item_num"]) {
+  //       continue;
+  //     }
+  //   }
+  //   return true;
+  // }
 
   void addToList() {
     quantity.add(sellsOrReturns == 1
@@ -886,8 +1071,6 @@ class InvoiceCubit extends Cubit<InvoiceStates> {
 
     debugPrint("1111111111111111111111");
   }
-
-  
 }
 
 // Future<void> insertAmount(context) async {

@@ -25,6 +25,7 @@ class home extends StatelessWidget {
         return MaterialApp(
           home: Stack(children: [
             Scaffold(
+              resizeToAvoidBottomInset: false,
               body: //const BillScreen(),
                   cubit.screens[cubit.bottomBarIndx],
               // appBar: AppBar(
@@ -65,16 +66,18 @@ class home extends StatelessWidget {
                     type: BottomNavigationBarType.fixed,
                     currentIndex: cubit.bottomBarIndx,
                     onTap: (index) {
+                      cubit.addTotal();
+                      cubit.calculateExpenses();
                       cubit.calculateDayTotal();
                       cubit.changeScreenIndex(index);
 
                       debugPrint(cubit.items.toString());
                     },
-                    elevation: 20,
+                    elevation: 30,
                     selectedFontSize: 15,
                     unselectedFontSize: 13,
                     iconSize: 32,
-                    selectedItemColor: Color.fromRGBO(32, 67, 89, 1),
+                    selectedItemColor: const Color.fromRGBO(32, 67, 89, 1),
                     items: const [
                       BottomNavigationBarItem(
                         icon: Icon(

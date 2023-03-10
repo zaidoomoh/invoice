@@ -46,18 +46,23 @@ dependencies:
   sqlbrite: ^2.3.0
   path: ^1.8.2
   flutter_cart: any
+  connectivity: any
+  dio: any
+  xml: any
+  local_auth: any
   
 
   #firebase
   firebase_core: ^1.24.0
   cloud_firestore: ^3.5.0
-  
+  firebase_database: any
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   intl: ^0.17.0
+  
   
 
 dev_dependencies:

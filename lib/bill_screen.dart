@@ -2,6 +2,8 @@
 // ignore_for_file: deprecated_member_use
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,79 +13,14 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:intl/intl.dart';
 import 'package:test1/returns.dart';
+import 'package:xml/xml.dart';
 import 'client.dart';
 import 'cubit.dart';
+import 'dio_helper.dart';
 import 'settings.dart';
 import 'states.dart';
 import 'items.dart';
 import 'shared/components/components.dart';
-
-List<Map<String, dynamic>>? maps;
-Future<Database> initializeDB(String tableNAME) async {
-  String path = await getDatabasesPath();
-  final dataBase = openDatabase(
-    join(path, 'database.db'),
-    onCreate: (database, version) async {
-      await database.execute(tableNAME);
-    },
-    version: 1,
-  );
-  return dataBase;
-}
-
-class Info {
-  String? subjectNameS;
-  String? subjectNumberS;
-  String? priceS;
-
-  Info({this.subjectNameS, this.subjectNumberS, this.priceS});
-
-  Info.fromMap(Map<String, dynamic> item)
-      : subjectNameS = item[" name"],
-        subjectNumberS = item[" number"],
-        priceS = item["price"];
-
-  Map<String, Object> toMap() {
-    return {
-      ' name': subjectNameS!,
-      ' number': subjectNumberS!,
-      'price': priceS!
-    };
-  }
-}
-
-Future<void> insertPerson(Info infoo) async {
-  // Get a reference to the database.
-  var db = await initializeDB("");
-  // Insert the Dog into the correct table. You might also specify the
-  // `conflictAlgorithm` to use in case the same dog is inserted twice.
-  // In this case, replace any previous data.
-  await db.insert('subjects', infoo.toMap());
-}
-
-var person = Info(
-    // subjectNameS: nameController.text,
-    // subjectNumberS: subjectNumberController.text,
-    // priceS: priceController.text,
-    );
-Future<List<Info>> dogs(String table) async {
-  // Get a reference to the database.
-  var db = await initializeDB(table);
-// Query the table for all The Dogs.
-  maps = await db
-      .query(/*'SELECT number FROM "info" WHERE name LIKE"zaid"'*/ 'subjects');
-  print(maps!.length);
-  print(maps);
-  print(maps![1]['name']);
-// Convert the List<Map<String, dynamic> into a List<Dog>.
-  return List.generate(maps!.length, (i) {
-    return Info(
-      priceS: maps![i]['price'],
-      subjectNameS: maps![i]['subject name'],
-      subjectNumberS: maps![i]['subject number'],
-    );
-  });
-}
 
 class BillScreen extends StatefulWidget {
   const BillScreen({Key? key}) : super(key: key);
@@ -114,27 +51,50 @@ class _BillScreenState extends State<BillScreen> {
         double blockSizeVertical = screenHeight / 100;
         var appBar = AppBar(
             backgroundColor: const Color.fromRGBO(32, 67, 89, 1),
-            title: Title(color: Colors.cyan, child: const Text('Bill maker')));
+            title: Title(
+                color: Colors.cyan,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Image.asset(
+                      'assets/optimal.png',
+                      width: 59,
+                      height: 59,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text('Optimal'),
+                  ],
+                )));
 
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: appBar,
           body: Column(
             children: [
               defaultCard(
+                  backgroundColor: const Color.fromRGBO(233, 238, 244, 1),
                   fontSize: 20,
                   smallConHeigt: (MediaQuery.of(context).size.height -
                           appBar.preferredSize.height -
                           MediaQuery.of(context).padding.top) *
-                      0.1,
+                      0.07,
                   smallConWedth: MediaQuery.of(context).size.width,
                   text: cubit.sellsOrReturns == 1
-                      ? 'INVOICE #:${formatter.format(cubit.getInvoiceNum())}'
-                      : 'RETURN #:${formatter.format(cubit.getReturnNum())}',
+                      ? 'INVOICE #: ${cubit.getInvoiceNum()}'
+                      : 'RETURN #: ${cubit.getReturnNum()}',
                   text1: cubit.formattedDate,
-                  fontColor: Colors.grey,
-                  onTap: () {}),
+                  fontColor: Colors.black,
+                  onTap: () {
+                    null;
+                  }),
               InkWell(
                 onLongPress: () {
+                  cubit.checkBiometrics()==cubit.auth.isDeviceSupported()?cubit.authenticate():
+                  debugPrint("lengthhhhh: ${(cubit.savedItems).toString()}");
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -196,19 +156,58 @@ class _BillScreenState extends State<BillScreen> {
                   );
                 },
                 child: defaultCard(
+                    backgroundColor: const Color.fromRGBO(233, 238, 244, 1),
                     fontSize: 15,
                     smallConHeigt: (MediaQuery.of(context).size.height -
                             appBar.preferredSize.height -
                             MediaQuery.of(context).padding.top) *
-                        0.1, //MediaQuery.of(context).size.height / 10,
+                        0.08, //MediaQuery.of(context).size.height / 10,
                     smallConWedth: blockSizeHorizontal *
                         100, //MediaQuery.of(context).size.width,
                     text: 'CLIENT',
                     text1: state is AddClient
                         ? state.clientName
                         : cubit.writeClientNameCon.text,
-                    fontColor: Colors.grey,
+                    fontColor: Colors.black,
                     onTap: () {
+                      // DioHelper.getData(url: '/posts', query: {
+                      // 'op':'getMax_id',
+                      //  'password': 'OptimalPass',
+                      //  'TableName': 'Table_Test',
+                      // 'op':'GetDonation',
+                      // 'ID':1
+                      // }).then((value) {
+                      //   debugPrint(value.data.toString());
+                      // }).catchError((e) {
+                      //   debugPrint(e.toString());
+                      // });
+
+                      // DioHelper.postData().then((value){
+                      //   debugPrint(value.data.toString());
+                      // }).catchError((e){debugPrint(e.toString());});
+
+                      // DioHelper.x().then((value) {
+                      //   // Parse the XML response
+                      //   final document =
+                      //       XmlDocument.parse(value.data.toString());
+                      //   final result = document
+                      //       .findAllElements('getMax_idResult')
+                      //       .single
+                      //       .text;
+                      //   // Do something with the result
+                      //   print(result);
+                      // }).catchError((e) {
+                      //   print('Error: $e');
+                      // });
+
+                      DioHelper.xx().then((value) {
+                        String xmlResponse = value.data;
+                        Map<String, dynamic> parsedResponse =
+                            jsonDecode(jsonEncode(xmlResponse));
+                      }).catchError((e) {
+                        debugPrint(e.toString());
+                      });
+
                       cubit.trueDate();
 
                       Navigator.push(
@@ -224,55 +223,6 @@ class _BillScreenState extends State<BillScreen> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        //cubit.loadData();
-                        // cubit.itemsCollectionRef.get().then((snapshot) {
-                        //   snapshot.docs.forEach((doc) {
-                        //     //cubit.fireStoreData.add(doc.data());
-                        //     print(doc["items"][1]);
-                        //     print(doc.exists);
-                        //   });
-
-                        // });
-
-                        // final QuerySnapshot result =
-                        //     await cubit.collection1.get();
-                        // final List<DocumentSnapshot> documents = result.docs;
-                        // documents.forEach(
-                        //     (doc) => debugPrint(doc.data().toString()));
-                        //Second, make iterator to get all document from fireStore
-                        // cubit.collection1.get().then((QuerySnapshot snapshot) {
-                        //   snapshot.docs.forEach((DocumentSnapshot document) {
-                        //     cubit.fireStoreData.add(document.data() as Map);
-                        //     debugPrint(document.toString());
-                        //   });
-                        // });
-
-                        // cubit.collection1.get().then((snapshot) {
-                        //   snapshot.docs.forEach((doc) async {
-                        //     Map<String, dynamic> fromFirestore(
-                        //         Map<String, dynamic> data) {
-                        //       debugPrint(data.toString());
-                        //       return data;
-                        //     }
-                        //   });
-                        // });
-
-                        // cubit.collection1.get().then((QuerySnapshot snapshot) {
-                        //   snapshot.docs.map((DocumentSnapshot document) {
-                        //     return document.data();
-                        //   }).toList();
-                        //   debugPrint(document.toString());
-                        // });
-
-                        // cubit.collection1.get().then((QuerySnapshot snapshot) {
-                        //   snapshot.docs.forEach((DocumentSnapshot document) {
-                        //     Map<String,dynamic> data = document.data();
-                        //     cubit.fireStoreData.add(data);
-                        //   });
-                        // });
-
-                        //cubit.addRecords();
-                        //cubit.sellsOrReturns = false;
                         cubit.getReturnNum();
                         cubit.trueDate();
                         Navigator.push(
@@ -395,18 +345,32 @@ class _BillScreenState extends State<BillScreen> {
                                                           .validate() &&
                                                       cubit.totalOfItem
                                                           .isNotEmpty &&
-                                                      num.parse(cubit
-                                                              .discountCon
-                                                              .text) <=
-                                                          cubit.totalAfter) {
+                                                      (num.parse(cubit
+                                                                  .discountCon
+                                                                  .text) <=
+                                                              cubit
+                                                                  .totalAfter ||
+                                                          num.parse(cubit
+                                                                      .discountCon
+                                                                      .text) *
+                                                                  -1 >=
+                                                              cubit
+                                                                  .totalAfter)) {
                                                     setState(() {
                                                       cubit.dis = num.parse(
                                                           cubit.discountCon
                                                               .text);
-
-                                                      cubit.totalAfter =
-                                                          cubit.totalBefor -
-                                                              cubit.dis;
+                                                      if (cubit
+                                                              .sellsOrReturns ==
+                                                          1) {
+                                                        cubit.totalAfter =
+                                                            cubit.totalBefor -
+                                                                cubit.dis;
+                                                      } else {
+                                                        cubit.totalAfter =
+                                                            cubit.totalBefor +
+                                                                cubit.dis;
+                                                      }
                                                     });
 
                                                     Navigator.pop(context);
@@ -437,7 +401,7 @@ class _BillScreenState extends State<BillScreen> {
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: Color.fromRGBO(230, 92, 79, 1),
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ],
@@ -453,213 +417,214 @@ class _BillScreenState extends State<BillScreen> {
                 padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
                 child: SizedBox(
                     width: double.infinity,
-                    height: 240,
+                    height: 280,
                     child: Card(
                       color: const Color.fromRGBO(233, 238, 244, 1),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: cubit.allAddedItems.isEmpty &&
-                                    cubit.quantity.isEmpty &&
-                                    cubit.totalOfItem.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                    "NO ITEMS",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 30),
-                                  ))
-                                : Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 5, right: 5, top: 5),
-                                        child: Card(
-                                          color: const Color.fromRGBO(
-                                              32, 67, 89, 1),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(3.0),
-                                            child: SizedBox(
-                                              width: blockSizeHorizontal * 93,
-                                              height: 10,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: const [
-                                                  Text(
-                                                    "ITEM",
-                                                    style: TextStyle(
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.grey),
-                                                  ),
-                                                  Text("QUANTITY",
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.grey)),
-                                                  Text("PRICE",
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.grey)),
-                                                  Text("TOTAL PRICE",
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.grey)),
-                                                ],
-                                              ),
+                      child: cubit.allAddedItems.isEmpty &&
+                              cubit.quantity.isEmpty &&
+                              cubit.totalOfItem.isEmpty
+                          ? const Center(
+                              child: Text(
+                              "NO ITEMS",
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 30),
+                            ))
+                          : Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 5, right: 5, top: 5),
+                                  child: Card(
+                                    color: const Color.fromRGBO(32, 67, 89, 1),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(3.0),
+                                      child: SizedBox(
+                                        width: blockSizeHorizontal * 93,
+                                        height: 10,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: const [
+                                            Text(
+                                              "ITEM",
+                                              style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.grey),
                                             ),
-                                          ),
+                                            Text("QUANTITY",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey)),
+                                            Text("PRICE",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey)),
+                                            Text("TOTAL PRICE",
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey)),
+                                          ],
                                         ),
                                       ),
-                                      Expanded(
-                                        child: ListView.builder(
-                                            itemCount:
-                                                cubit.allAddedItems.length,
-                                            itemBuilder: (context, index) {
-                                              return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10,
-                                                    right: 10,
-                                                    top: 5),
-                                                child: SizedBox(
-                                                  height: 40,
-                                                  child: Dismissible(
-                                                    key: UniqueKey(),
-                                                    onDismissed: (direction) {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return Wrap(
-                                                              children: <
-                                                                  Widget>[
-                                                                StatefulBuilder(
-                                                                  builder: (BuildContext
-                                                                          context,
-                                                                      void Function(
-                                                                              void Function())
-                                                                          setState) {
-                                                                    return AlertDialog(
-                                                                      title: const Text(
-                                                                          '  هل تريد حذف هذه المادة  '),
-                                                                      content:
-                                                                          Form(
-                                                                        key: cubit
-                                                                            .formkey,
-                                                                        child: Column(
-                                                                            children: []),
-                                                                      ),
-                                                                      actions: <
-                                                                          Widget>[
-                                                                        ElevatedButton(
-                                                                          style:
-                                                                              ElevatedButton.styleFrom(backgroundColor: const Color.fromRGBO(120, 166, 200, 1)),
-                                                                          child:
-                                                                              const Text('CANCEL'),
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                        ),
-                                                                        Builder(builder:
-                                                                            (context) {
-                                                                          return ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: const Color.fromRGBO(120, 166, 200, 1)),
-                                                                              child: const Text('DELETE'),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                                cubit.del(index);
-                                                                              });
-                                                                        }),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ]);
-                                                        },
-                                                      );
-                                                    },
-                                                    child: InkWell(
-                                                      child: Card(
-                                                        color: const Color
-                                                                .fromRGBO(
-                                                            120, 166, 200, 1),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      5),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                cubit
-                                                                    .allAddedItems[
-                                                                        index][
-                                                                        'item_desc']
-                                                                    .toString(),
-                                                                style: const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w900,
-                                                                    fontSize:
-                                                                        15),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ListView.builder(
+                                      physics: const BouncingScrollPhysics(),
+                                      itemCount: cubit.allAddedItems.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 10, top: 5),
+                                          child: SizedBox(
+                                            height: 40,
+                                            child: Dismissible(
+                                              key: UniqueKey(),
+                                              onDismissed: (direction) {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return Wrap(children: <
+                                                        Widget>[
+                                                      StatefulBuilder(
+                                                        builder: (BuildContext
+                                                                context,
+                                                            void Function(
+                                                                    void
+                                                                        Function())
+                                                                setState) {
+                                                          return AlertDialog(
+                                                            title: const Text(
+                                                                '  هل تريد حذف هذه المادة  '),
+                                                            content: Form(
+                                                              key:
+                                                                  cubit.formkey,
+                                                              child: Column(
+                                                                  children: []),
+                                                            ),
+                                                            actions: <Widget>[
+                                                              ElevatedButton(
+                                                                style: ElevatedButton.styleFrom(
+                                                                    backgroundColor:
+                                                                        const Color.fromRGBO(
+                                                                            120,
+                                                                            166,
+                                                                            200,
+                                                                            1)),
+                                                                child: const Text(
+                                                                    'CANCEL'),
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
                                                               ),
-                                                              Text(
-                                                                (cubit.quantity[
-                                                                        index])
-                                                                    .toString(),
-                                                                style: const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w900,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                              Text(
-                                                                "${cubit.priceOfItem[index].toString()}JD",
-                                                                style: const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w900,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                              Text(
-                                                                "${totalFormatter.format(cubit.totalOfItem[index]).toString()}JD",
-                                                                style: const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w900,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
+                                                              Builder(builder:
+                                                                  (context) {
+                                                                return ElevatedButton(
+                                                                    style: ElevatedButton.styleFrom(
+                                                                        backgroundColor: const Color.fromRGBO(
+                                                                            120,
+                                                                            166,
+                                                                            200,
+                                                                            1)),
+                                                                    child: const Text(
+                                                                        'DELETE'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      cubit.del(
+                                                                          index);
+                                                                    });
+                                                              }),
                                                             ],
-                                                          ),
-                                                        ),
+                                                          );
+                                                        },
                                                       ),
+                                                    ]);
+                                                  },
+                                                );
+                                              },
+                                              child: InkWell(
+                                                child: Card(
+                                                  color: const Color.fromRGBO(
+                                                      120, 166, 200, 1),
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 5),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          cubit.allAddedItems[
+                                                                  index]
+                                                                  ['item_desc']
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                  fontSize: 15),
+                                                        ),
+                                                        Text(
+                                                          (cubit.quantity[
+                                                                  index])
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                  fontSize: 15),
+                                                        ),
+                                                        Text(
+                                                          cubit.priceOfItem[
+                                                                  index]
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                  fontSize: 15),
+                                                        ),
+                                                        Text(
+                                                          totalFormatter
+                                                              .format(cubit
+                                                                      .totalOfItem[
+                                                                  index])
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
-                                              );
-                                              //}
-                                            }),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        ],
-                      ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                        //}
+                                      }),
+                                ),
+                              ],
+                            ),
                     )),
               ),
               Padding(
@@ -722,7 +687,10 @@ class _BillScreenState extends State<BillScreen> {
                                           type: cubit.sellsOrReturns,
                                           clientId: cubit.client_id,
                                           notes: "",
-                                          invoiceNumber:cubit.sellsOrReturns==1?cubit.getInvoiceNum():cubit.getReturnNum(),
+                                          invoiceNumber:
+                                              cubit.sellsOrReturns == 1
+                                                  ? cubit.getInvoiceNum()
+                                                  : cubit.getReturnNum(),
                                           invoiceDate:
                                               cubit.formattedDate.toString(),
                                           clientName: cubit.client_name,
@@ -755,9 +723,11 @@ class _BillScreenState extends State<BillScreen> {
                                           quentity: int.parse(cubit.quantity[
                                               cubit.allAddedItems
                                                   .indexOf(element)]),
-                                          price: (cubit.totalOfItem[cubit
-                                              .allAddedItems
-                                              .indexOf(element)]),
+                                          price: cubit.dis == 0
+                                              ? (cubit.totalOfItem[cubit
+                                                  .allAddedItems
+                                                  .indexOf(element)])
+                                              : cubit.totalAfter,
                                           tax: int.parse(cubit.dropdownValue),
                                           invoiceNumber:
                                               cubit.sellsOrReturns == 1
@@ -767,6 +737,9 @@ class _BillScreenState extends State<BillScreen> {
                                         );
                                       });
                                     }
+                                    setState(() {
+                                      cubit.sellsOrReturns = 1;
+                                    });
                                     cubit.afterSave();
                                   },
                                   text: "save")
@@ -778,22 +751,23 @@ class _BillScreenState extends State<BillScreen> {
           ),
           drawer: Drawer(
             child: ListView(padding: EdgeInsets.zero, children: [
-              InkWell(
-                onDoubleTap: () {
-                  debugPrint(cubit.settingsList.toString());
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SettingsScreen()),
-                  );
-                },
-                child: const DrawerHeader(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/icons-settings.png"),
-                        fit: BoxFit.none),
-                    color: Color.fromRGBO(230, 92, 79, 1),
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/icons-settings.png"),
+                    fit: BoxFit.none,
                   ),
+                  color: Color.fromRGBO(230, 92, 79, 1),
+                ),
+                child: InkWell(
+                  onDoubleTap: () {
+                    debugPrint(cubit.settingsList.toString());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsScreen()),
+                    );
+                  },
                   child: null,
                 ),
               ),
@@ -1020,11 +994,7 @@ class _BillScreenState extends State<BillScreen> {
               Builder(builder: ((context) {
                 return ListTile(
                   onTap: () {
-                    // Fluttertoast.showToast(
-                    //   msg: "under development",
-                    //   toastLength: Toast.LENGTH_LONG,
-                    //   gravity: ToastGravity.CENTER,
-                    //);
+                    cubit.afterSave();
                     if (cubit.sellsOrReturns == -1) {
                       setState(
                         () {
@@ -1045,10 +1015,150 @@ class _BillScreenState extends State<BillScreen> {
                       );
                       cubit.getReturnNum();
                       Navigator.pop(context);
+                      Fluttertoast.showToast(
+                        backgroundColor: const Color.fromRGBO(32, 67, 89, 1),
+                        fontSize: 25,
+                        msg: "المرتجعات",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.CENTER,
+                      );
                     }
                   },
                   title: const Text(
                     'المرتجعات',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                );
+              })),
+              Builder(builder: ((context) {
+                return ListTile(
+                  onTap: () {
+                    Navigator.pop(context);
+                    showBottomSheet(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Container(
+                            height: 300,
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(220, 92, 79, 1),
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(10)),
+                            ),
+                            child: Column(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(5.0),
+                                  child: Text(
+                                    "المصاريف",
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: TextFormField(
+                                    controller: cubit.expenseDescController,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: const InputDecoration(
+                                      hintText: "المصاريف",
+                                      hintStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Color.fromRGBO(32, 67, 89, 1),
+                                        ),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.text,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15),
+                                  child: TextFormField(
+                                    controller: cubit.expensePriceController,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: const InputDecoration(
+                                      hintText: "المجموع",
+                                      hintStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Color.fromRGBO(32, 67, 89, 1),
+                                        ),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'[0-9 .]')),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30))),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                      const Color.fromRGBO(32, 67, 89, 1),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    cubit
+                                        .insertToExpenses(
+                                            expenseDesc: cubit
+                                                .expenseDescController.text,
+                                            expensePrice: int.parse(cubit
+                                                .expensePriceController.text),
+                                            expenseDate: cubit.formatOfDate
+                                                .format(DateTime.now())
+                                                .toString())
+                                        .then((value) {
+                                      cubit.calculateExpenses();
+                                      cubit.calculateDayTotal();
+                                    });
+                                    Navigator.pop(context);
+                                    cubit.expenseDescController.clear();
+                                    cubit.expensePriceController.clear();
+                                  },
+                                  //elevation: 10,
+
+                                  child: const Icon(Icons.add),
+                                ),
+                              ],
+                            ),
+                          );
+                        });
+                  },
+                  title: const Text(
+                    'المصاريف',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 );

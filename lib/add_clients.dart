@@ -28,6 +28,7 @@ class _AddClientsState extends State<AddClients> {
           TextEditingController clientName = TextEditingController();
           TextEditingController phone = TextEditingController();
           return Scaffold(
+            resizeToAvoidBottomInset: false,
               appBar: AppBar(
                   backgroundColor: Color.fromRGBO(50, 103, 137, 1),
                   title: const Text("اضافة عميل")),

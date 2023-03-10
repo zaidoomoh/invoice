@@ -41,6 +41,7 @@ Widget defaultCard({
   required String text1,
   required Color fontColor,
   required Function onTap,
+  required Color backgroundColor,
 }) =>
     Padding(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
@@ -52,7 +53,7 @@ Widget defaultCard({
             onTap();
           },
           child: Card(
-              color: Color.fromRGBO(233, 238, 244, 1),
+              color: backgroundColor,
               elevation: 5,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -95,10 +96,6 @@ Widget defaultTextFormFeild(
         required IconData prefix,
         required Color color,
         String? warning,
-        
-        
-
-         
         TextInputFormatter? textInputFormatter}) =>
     SizedBox(
         child: TextFormField(
