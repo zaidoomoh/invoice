@@ -49,15 +49,8 @@ class _TestState extends State<Test> {
         child: BlocConsumer<InvoiceCubit, InvoiceStates>(
             listener: (context, state) {},
             builder: (context, state) {
-              return Sizer(
-                builder: (BuildContext context, Orientation orientation,
-                    DeviceType deviceType) {
-                  return MaterialApp(
-
-                      //theme: ThemeData(fontFamily: "Antihero"),
-                      home: home());
-                },
-              );
+              return MaterialApp(
+                  home: home());
             }));
   }
 }

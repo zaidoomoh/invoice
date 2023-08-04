@@ -334,9 +334,8 @@ class _HistoryState extends State<History> {
                           toastLength: Toast.LENGTH_LONG,
                           gravity: ToastGravity.CENTER,
                         );
-
                         debugPrint(connectivityResult.toString());
-                      } else if(cubit.invoiceInfoTable.isNotEmpty){
+                      } else if(cubit.savedItemsInfo.isNotEmpty){
                         // There is an active internet connection.
                         cubit.addInvoices();
                         cubit.addExpenses();
@@ -349,6 +348,15 @@ class _HistoryState extends State<History> {
                           gravity: ToastGravity.CENTER,
                         );
                         debugPrint(connectivityResult.toString());
+                      }
+                      else{
+                        Fluttertoast.showToast(
+                          backgroundColor: const Color.fromRGBO(32, 67, 89, 1),
+                          fontSize: 25,
+                          msg: "لا يوجد فواتير",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.CENTER,
+                        );
                       }
                     }),
                 FloatingActionButton(

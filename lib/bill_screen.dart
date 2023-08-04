@@ -43,7 +43,6 @@ class _BillScreenState extends State<BillScreen> {
         TextEditingController nameController = TextEditingController();
         TextEditingController subjectNumberController = TextEditingController();
         TextEditingController priceController = TextEditingController();
-
         MediaQueryData mediaQueryData = MediaQuery.of(context);
         double screenWidth = mediaQueryData.size.width;
         double screenHeight = mediaQueryData.size.height;
@@ -88,13 +87,13 @@ class _BillScreenState extends State<BillScreen> {
                       : 'RETURN #: ${cubit.getReturnNum()}',
                   text1: cubit.formattedDate,
                   fontColor: Colors.black,
-                  onTap: () {
-                    null;
-                  }),
+                  onTap: () {}),
               InkWell(
                 onLongPress: () {
-                  cubit.checkBiometrics()==cubit.auth.isDeviceSupported()?cubit.authenticate():
-                  debugPrint("lengthhhhh: ${(cubit.savedItems).toString()}");
+                  cubit.checkBiometrics() == cubit.auth.isDeviceSupported()
+                      ? cubit.authenticate()
+                      : debugPrint(
+                          "lengthhhhh: ${(cubit.savedItems).toString()}");
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -186,6 +185,7 @@ class _BillScreenState extends State<BillScreen> {
                       //   debugPrint(value.data.toString());
                       // }).catchError((e){debugPrint(e.toString());});
 
+                      DioHelper.getMaxId();
                       // DioHelper.x().then((value) {
                       //   // Parse the XML response
                       //   final document =
@@ -200,16 +200,15 @@ class _BillScreenState extends State<BillScreen> {
                       //   print('Error: $e');
                       // });
 
-                      DioHelper.xx().then((value) {
-                        String xmlResponse = value.data;
-                        Map<String, dynamic> parsedResponse =
-                            jsonDecode(jsonEncode(xmlResponse));
-                      }).catchError((e) {
-                        debugPrint(e.toString());
-                      });
+                      // DioHelper.xx().then((value) {
+                      //   String xmlResponse = value.data;
+                      //   Map<String, dynamic> parsedResponse =
+                      //       jsonDecode(jsonEncode(xmlResponse));
+                      // }).catchError((e) {
+                      //   debugPrint(e.toString());
+                      // });
 
                       cubit.trueDate();
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Client()),
@@ -673,76 +672,145 @@ class _BillScreenState extends State<BillScreen> {
                                       ))
                                 ],
                               ),
-                              defaultButon(
-                                  height: blockSizeVertical * 4,
-                                  fontSize: 13,
-                                  width: (blockSizeHorizontal * 20),
-                                  background:
-                                      const Color.fromRGBO(32, 67, 89, 1),
-                                  function: () {
-                                    if (cubit.allAddedItems.isNotEmpty &&
-                                        cubit.quantity.isNotEmpty &&
-                                        cubit.totalOfItem.isNotEmpty) {
-                                      cubit.insertToInvoiceInfo(
-                                          type: cubit.sellsOrReturns,
-                                          clientId: cubit.client_id,
-                                          notes: "",
-                                          invoiceNumber:
-                                              cubit.sellsOrReturns == 1
-                                                  ? cubit.getInvoiceNum()
-                                                  : cubit.getReturnNum(),
-                                          invoiceDate:
-                                              cubit.formattedDate.toString(),
-                                          clientName: cubit.client_name,
-                                          total: cubit.totalAfter);
-
-                                      // while (cubit.savedItemsIndx <
-                                      //     cubit.allAddedItems.length) {
-                                      //   cubit.insertInvoiceItems(
-                                      //       infoId: cubit.getInfoId(),
-                                      //       unitId: 0,
-                                      //       quentity: int.parse(cubit.quantity[
-                                      //               cubit.savedItemsIndx])
-                                      //           ,
-                                      //       price: int.parse(cubit.totalOfItem[
-                                      //               cubit.savedItemsIndx])
-                                      //           ,
-                                      //       tax: 0,
-                                      //       items: cubit.allAddedItems[cubit
-                                      //               .savedItemsIndx]["item_desc"]
-                                      //           .toString(),
-                                      //       invoiceNumber: cubit
-                                      //           .getInvoiceNum()
-                                      //           );
-                                      //   cubit.savedItemsIndx++;
-                                      // }
-                                      cubit.allAddedItems.forEach((element) {
-                                        cubit.insertInvoiceItems(
-                                          infoId: cubit.getInfoId(),
-                                          unitId: 0,
-                                          quentity: int.parse(cubit.quantity[
-                                              cubit.allAddedItems
-                                                  .indexOf(element)]),
-                                          price: cubit.dis == 0
-                                              ? (cubit.totalOfItem[cubit
-                                                  .allAddedItems
-                                                  .indexOf(element)])
-                                              : cubit.totalAfter,
-                                          tax: int.parse(cubit.dropdownValue),
-                                          invoiceNumber:
-                                              cubit.sellsOrReturns == 1
-                                                  ? cubit.getInvoiceNum()
-                                                  : cubit.getReturnNum(),
-                                          items: element["item_desc"],
-                                        );
+                              Row(
+                                children: [
+                                  FloatingActionButton(
+                                    onPressed: () {
+                                      cubit.afterSave();
+                                    },
+                                    backgroundColor:
+                                        const Color.fromRGBO(230, 92, 79, 1),
+                                    child: const Icon(
+                                      Icons.clear_all,
+                                      size: 40,
+                                      color: Color.fromRGBO(233, 238, 244, 1),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  FloatingActionButton(
+                                    onPressed: () {
+                                      if (cubit.allAddedItems.isNotEmpty &&
+                                          cubit.quantity.isNotEmpty &&
+                                          cubit.totalOfItem.isNotEmpty) {
+                                        cubit.insertToInvoiceInfo(
+                                            type: cubit.sellsOrReturns,
+                                            clientId: cubit.client_id,
+                                            notes: "",
+                                            invoiceNumber:
+                                                cubit.sellsOrReturns == 1
+                                                    ? cubit.getInvoiceNum()
+                                                    : cubit.getReturnNum(),
+                                            invoiceDate:
+                                                cubit.formattedDate.toString(),
+                                            clientName: cubit.client_name,
+                                            total: cubit.totalAfter);
+                                        cubit.allAddedItems.forEach((element) {
+                                          cubit.insertInvoiceItems(
+                                            infoId: cubit.getInfoId(),
+                                            unitId: 0,
+                                            quentity: int.parse(cubit.quantity[
+                                                cubit.allAddedItems
+                                                    .indexOf(element)]),
+                                            price: cubit.dis == 0
+                                                ? (cubit.totalOfItem[cubit
+                                                    .allAddedItems
+                                                    .indexOf(element)])
+                                                : cubit.totalAfter,
+                                            tax: int.parse(cubit.dropdownValue),
+                                            invoiceNumber:
+                                                cubit.sellsOrReturns == 1
+                                                    ? cubit.getInvoiceNum()
+                                                    : cubit.getReturnNum(),
+                                            items: element["item_desc"],
+                                          );
+                                        });
+                                      }
+                                      setState(() {
+                                        cubit.sellsOrReturns = 1;
                                       });
-                                    }
-                                    setState(() {
-                                      cubit.sellsOrReturns = 1;
-                                    });
-                                    cubit.afterSave();
-                                  },
-                                  text: "save")
+                                      cubit.afterSave();
+                                    },
+                                    backgroundColor:
+                                        const Color.fromRGBO(32, 67, 89, 1),
+                                    child: const Icon(
+                                      Icons.save,
+                                      size: 40,
+                                      color: Color.fromRGBO(233, 238, 244, 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // defaultButon(
+                              //     height: blockSizeVertical * 4,
+                              //     fontSize: 13,
+                              //     width: (blockSizeHorizontal * 20),
+                              //     background:
+                              //         const Color.fromRGBO(32, 67, 89, 1),
+                              //     function: () {
+                              //       if (cubit.allAddedItems.isNotEmpty &&
+                              //           cubit.quantity.isNotEmpty &&
+                              //           cubit.totalOfItem.isNotEmpty) {
+                              //         cubit.insertToInvoiceInfo(
+                              //             type: cubit.sellsOrReturns,
+                              //             clientId: cubit.client_id,
+                              //             notes: "",
+                              //             invoiceNumber:
+                              //                 cubit.sellsOrReturns == 1
+                              //                     ? cubit.getInvoiceNum()
+                              //                     : cubit.getReturnNum(),
+                              //             invoiceDate:
+                              //                 cubit.formattedDate.toString(),
+                              //             clientName: cubit.client_name,
+                              //             total: cubit.totalAfter);
+                              //         // while (cubit.savedItemsIndx <
+                              //         //     cubit.allAddedItems.length) {
+                              //         //   cubit.insertInvoiceItems(
+                              //         //       infoId: cubit.getInfoId(),
+                              //         //       unitId: 0,
+                              //         //       quentity: int.parse(cubit.quantity[
+                              //         //               cubit.savedItemsIndx])
+                              //         //           ,
+                              //         //       price: int.parse(cubit.totalOfItem[
+                              //         //               cubit.savedItemsIndx])
+                              //         //           ,
+                              //         //       tax: 0,
+                              //         //       items: cubit.allAddedItems[cubit
+                              //         //               .savedItemsIndx]["item_desc"]
+                              //         //           .toString(),
+                              //         //       invoiceNumber: cubit
+                              //         //           .getInvoiceNum()
+                              //         //           );
+                              //         //   cubit.savedItemsIndx++;
+                              //         // }
+                              //         cubit.allAddedItems.forEach((element) {
+                              //           cubit.insertInvoiceItems(
+                              //             infoId: cubit.getInfoId(),
+                              //             unitId: 0,
+                              //             quentity: int.parse(cubit.quantity[
+                              //                 cubit.allAddedItems
+                              //                     .indexOf(element)]),
+                              //             price: cubit.dis == 0
+                              //                 ? (cubit.totalOfItem[cubit
+                              //                     .allAddedItems
+                              //                     .indexOf(element)])
+                              //                 : cubit.totalAfter,
+                              //             tax: int.parse(cubit.dropdownValue),
+                              //             invoiceNumber:
+                              //                 cubit.sellsOrReturns == 1
+                              //                     ? cubit.getInvoiceNum()
+                              //                     : cubit.getReturnNum(),
+                              //             items: element["item_desc"],
+                              //           );
+                              //         });
+                              //       }
+                              //       setState(() {
+                              //         cubit.sellsOrReturns = 1;
+                              //       });
+                              //       cubit.afterSave();
+                              //     },
+                              //     text: "save")
                             ],
                           ),
                         ))),

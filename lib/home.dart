@@ -26,8 +26,7 @@ class home extends StatelessWidget {
           home: Stack(children: [
             Scaffold(
               resizeToAvoidBottomInset: false,
-              body: //const BillScreen(),
-                  cubit.screens[cubit.bottomBarIndx],
+              body: cubit.screens[cubit.bottomBarIndx],
               // appBar: AppBar(
               //   actions: [
               //   SizedBox(
@@ -70,7 +69,6 @@ class home extends StatelessWidget {
                       cubit.calculateExpenses();
                       cubit.calculateDayTotal();
                       cubit.changeScreenIndex(index);
-
                       debugPrint(cubit.items.toString());
                     },
                     elevation: 30,
